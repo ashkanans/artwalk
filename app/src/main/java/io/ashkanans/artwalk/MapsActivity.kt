@@ -100,6 +100,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun drawDirectionOnMap(direction: Float) {
+        // Check if currentLocation is null
+        if (currentLocation == null) {
+            // Handle the case where currentLocation is null, maybe show a message or return early
+            return
+        }
+
         // Remove previous direction overlay
         directionPolygon?.remove()
 
@@ -119,6 +125,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         directionPolygon = mMap.addPolygon(sectorOptions)
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
