@@ -31,6 +31,8 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.SphericalUtil
 import io.ashkanans.artwalk.databinding.ActivityMapsBinding
+
+import java.util.function.Consumer
 import kotlin.math.atan2
 
 
@@ -57,11 +59,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         magnetometer?.let {
-            sensorManager.registerListener(
-                magnetometerListener,
-                it,
-                SensorManager.SENSOR_DELAY_NORMAL
-            )
+            sensorManager.registerListener(magnetometerListener, it, SensorManager.SENSOR_DELAY_NORMAL)
         }
     }
 
@@ -103,6 +101,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Check if currentLocation is null
         if (currentLocation == null) {
             // Handle the case where currentLocation is null, maybe show a message or return early
+            directionPolygon?.remove()
             return
         }
 
@@ -112,20 +111,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Draw a quarter circular sector on the map representing the direction
         val centerLatLng = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
         val radius = 50 // Adjust the radius as needed (smaller radius)
-        val startAngle =
-            direction - 45 // Starting angle of the sector (e.g., 45 degrees left of the direction)
+        val startAngle = direction - 45 // Starting angle of the sector (e.g., 45 degrees left of the direction)
         val sweepAngle = 90 // Sweep angle of the sector (e.g., 90 degrees)
         val sectorOptions = PolygonOptions()
             .strokeColor(Color.TRANSPARENT) // No border
             .fillColor(Color.argb(128, 255, 0, 0)) // Red color for fill
         for (i in startAngle.toInt()..(startAngle + sweepAngle).toInt()) {
-            val point =
-                SphericalUtil.computeOffset(centerLatLng, radius.toDouble(), i.toDouble() - 90)
+            val point = SphericalUtil.computeOffset(centerLatLng, radius.toDouble(), i.toDouble() - 90)
             sectorOptions.add(point)
         }
         directionPolygon = mMap.addPolygon(sectorOptions)
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,7 +137,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize Fused Location Provider client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        this.permission = isLocationPermissionGranted()
+        this.permission= isLocationPermissionGranted()
     }
 
 
@@ -241,12 +237,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .fillColor(Color.argb(32, 0, 0, 255)) // Very light blue color for fill
             mMap.addCircle(accuracyCircleOptions)
 
-            mMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    latLng,
-                    17f
-                )
-            ) // Adjust zoom level as needed
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f)) // Adjust zoom level as needed
         }
     }
 
@@ -273,11 +264,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }, updateInterval)
     }
 
-    private fun getBestLocation(
-        gpsLocation: Location?,
-        networkLocation: Location?,
-        fusedLocation: Location?
-    ): Location? {
+    private fun getBestLocation(gpsLocation: Location?, networkLocation: Location?, fusedLocation: Location?): Location? {
         // Choose the best location based on accuracy
         var bestLocation: Location? = null
 
@@ -295,6 +282,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         bestLocation = gpsLocation
         return bestLocation
     }
+
 
 
     private fun isLocationPermissionGranted(): Boolean {
