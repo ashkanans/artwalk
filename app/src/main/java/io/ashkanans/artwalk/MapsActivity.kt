@@ -31,8 +31,6 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.SphericalUtil
 import io.ashkanans.artwalk.databinding.ActivityMapsBinding
-
-import java.util.function.Consumer
 import kotlin.math.atan2
 
 
@@ -54,6 +52,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var magnetometer: Sensor? = null
 
     private var directionPolygon: Polygon? = null
+    private var currentDirectionAngle: Float = 0f
     override fun onResume() {
         super.onResume()
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -97,7 +96,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return direction
     }
 
-    private fun drawDirectionOnMap(direction: Float) {
+    private fun drawDirectionOnMap(newDirection: Float) {
         // Check if currentLocation is null
         if (currentLocation == null) {
             // Handle the case where currentLocation is null, maybe show a message or return early
@@ -105,23 +104,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        // Remove previous direction overlay
-        directionPolygon?.remove()
-
         // Draw a quarter circular sector on the map representing the direction
         val centerLatLng = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
         val radius = 50 // Adjust the radius as needed (smaller radius)
-        val startAngle = direction - 45 // Starting angle of the sector (e.g., 45 degrees left of the direction)
+        val startAngle =
+            newDirection - 135 // Starting angle of the sector (e.g., 45 degrees left of the direction)
         val sweepAngle = 90 // Sweep angle of the sector (e.g., 90 degrees)
         val sectorOptions = PolygonOptions()
             .strokeColor(Color.TRANSPARENT) // No border
             .fillColor(Color.argb(128, 255, 0, 0)) // Red color for fill
+
+        // If directionPolygon already exists, update its angle
+        if (directionPolygon != null) {
+            val angleDiff = newDirection - currentDirectionAngle
+            val updatedPoints = mutableListOf<LatLng>()
+            for (point in directionPolygon!!.points) {
+                val angle = SphericalUtil.computeHeading(centerLatLng, point)
+                val newPoint = SphericalUtil.computeOffset(
+                    centerLatLng,
+                    radius.toDouble(),
+                    (angle + angleDiff).toDouble()
+                )
+                updatedPoints.add(newPoint)
+            }
+            directionPolygon!!.points = updatedPoints
+            currentDirectionAngle = newDirection
+            return
+        }
+
+        // Create new directionPolygon if it doesn't exist
         for (i in startAngle.toInt()..(startAngle + sweepAngle).toInt()) {
-            val point = SphericalUtil.computeOffset(centerLatLng, radius.toDouble(), i.toDouble() - 90)
+            val point = SphericalUtil.computeOffset(centerLatLng, radius.toDouble(), i.toDouble())
             sectorOptions.add(point)
         }
         directionPolygon = mMap.addPolygon(sectorOptions)
+        currentDirectionAngle = newDirection
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -214,7 +233,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun handleLocationUpdate(location: Location) {
-        if (currentLocation == null || location.accuracy < currentLocation!!.accuracy) {
+        if (currentLocation == null) {
             currentLocation = location
             val latLng = LatLng(location.latitude, location.longitude)
 
@@ -237,7 +256,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .fillColor(Color.argb(32, 0, 0, 255)) // Very light blue color for fill
             mMap.addCircle(accuracyCircleOptions)
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f)) // Adjust zoom level as needed
+            mMap.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    latLng,
+                    16.5f
+                )
+            ) // Adjust zoom level as needed
         }
     }
 
