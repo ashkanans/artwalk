@@ -14,7 +14,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.widget.Button
+import android.widget.ImageButton
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -160,7 +160,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         this.permission= isLocationPermissionGranted()
 
         // Set onClickListener for the relocate button
-        val relocateButton: Button = findViewById(R.id.relocate_button)
+        val relocateButton: ImageButton = findViewById(R.id.relocate_button)
         relocateButton.setOnClickListener {
             // Call the method to move the camera to the user's current location
             relocateCameraToCurrentLocation()

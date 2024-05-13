@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">ArtWalk</string>
-    <string name="title_activity_maps">MapsActivity</string>
+    <string name="title_activity_maps">ArtWalk</string>
 </resources>
