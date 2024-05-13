@@ -14,6 +14,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -150,13 +151,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.location_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         // Initialize Fused Location Provider client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         this.permission= isLocationPermissionGranted()
+
+        // Set onClickListener for the relocate button
+        val relocateButton: Button = findViewById(R.id.relocate_button)
+        relocateButton.setOnClickListener {
+            // Call the method to move the camera to the user's current location
+            relocateCameraToCurrentLocation()
+        }
     }
 
 
@@ -230,6 +238,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}
+    }
+
+    private fun relocateCameraToCurrentLocation() {
+        // Check if currentLocation is not null
+        currentLocation?.let { location ->
+            val latLng = LatLng(location.latitude, location.longitude)
+            mMap.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    latLng,
+                    16.5f
+                )
+            )
+        }
     }
 
     private fun handleLocationUpdate(location: Location) {
