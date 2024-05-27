@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "ArtWalk"
 include(":app")
+include(":app:lib")
+include(":app:services")
