@@ -1,0 +1,3 @@
+interface OnLoginClickListener {
+    fun onLoginClicked()
+}

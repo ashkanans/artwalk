@@ -1,19 +1,19 @@
 import android.content.Context
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 
 class LoginAdapter(
-    fragmentActivity: FragmentActivity,
+    fm: FragmentManager,
     private val context: Context,
     private val totalTabs: Int
-) : FragmentStateAdapter(fragmentActivity) {
+) : FragmentPagerAdapter(fm) {
 
-    override fun getItemCount(): Int {
+    override fun getCount(): Int {
         return totalTabs
     }
 
-    override fun createFragment(position: Int): Fragment {
+    override fun getItem(position: Int): Fragment {
         return when (position) {
             0 -> LogintabFragment()
             1 -> SignuptabFragment()

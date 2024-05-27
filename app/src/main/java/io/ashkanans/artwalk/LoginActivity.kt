@@ -4,14 +4,13 @@ import LoginAdapter
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager.widget.ViewPager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
-    private lateinit var viewPager: ViewPager2
+    private lateinit var viewPager: ViewPager
     private lateinit var google: FloatingActionButton
     private lateinit var loginButton: Button
 
@@ -24,16 +23,10 @@ class LoginActivity : AppCompatActivity() {
         google = findViewById(R.id.fab_fb)
         val v: Float = 0f
 
-        val adapter = LoginAdapter(this, this, tabLayout.tabCount)
+        val adapter = LoginAdapter(supportFragmentManager, this, 2)
         viewPager.adapter = adapter
 
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> "Login"
-                1 -> "Signup"
-                else -> null
-            }
-        }.attach()
+        viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
 
         google.translationY = 300f
         tabLayout.translationY = 300f
@@ -42,22 +35,8 @@ class LoginActivity : AppCompatActivity() {
         tabLayout.alpha = v
 
         google.animate().translationY(0f).alpha(1f).setDuration(1000).setStartDelay(400).start()
+        tabLayout.animate().translationY(0f).alpha(1f).setDuration(1000).setStartDelay(400).start()
 
-//        loginButton = findViewById(R.id.login)
-//        loginButton.setOnClickListener {
-//            if (validateLogin()) {
-//                val intent = Intent(this@LoginActivity, MapsActivity::class.java)
-//                startActivity(intent)
-//                finish()
-//            } else {
-//                Toast.makeText(this@LoginActivity, "Invalid login credentials", Toast.LENGTH_SHORT).show()
-//            }
-//        }
     }
 
-    private fun validateLogin(): Boolean {
-        // Implement your login validation logic here
-        // Return true if valid, false otherwise
-        return true // This is a placeholder
-    }
 }

@@ -1,8 +1,11 @@
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import io.ashkanans.artwalk.MapsActivity
 import io.ashkanans.artwalk.R
 
 class LogintabFragment : Fragment() {
@@ -10,6 +13,7 @@ class LogintabFragment : Fragment() {
     private lateinit var pass: View
     private lateinit var forgetPass: View
     private lateinit var login: View
+    private var loginClickListener: OnLoginClickListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,5 +44,34 @@ class LogintabFragment : Fragment() {
         login.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(700).start()
 
         return root
+    }
+
+    fun setOnLoginClickListener(listener: OnLoginClickListener) {
+        loginClickListener = listener
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Set click listener for loginButton
+        login.setOnClickListener {
+            // Validate login credentials
+            if (validateLogin()) {
+                // If valid, start MapsActivity
+                val intent = Intent(requireContext(), MapsActivity::class.java)
+                startActivity(intent)
+                requireActivity().finish() // Finish LoginActivity
+            } else {
+                // If invalid, show toast
+                Toast.makeText(requireContext(), "Invalid login credentials", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    private fun validateLogin(): Boolean {
+        // Implement your login validation logic here
+        // For now, let's assume login is always successful
+        return true
     }
 }
