@@ -34,65 +34,69 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
 
-        loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
-            val loginState = it ?: return@Observer
+        loginViewModel.loginFormState.observe(this@LoginActivity, Observer { loginState ->
+            loginState ?: return@Observer
 
-            // disable login button unless both username / password is valid
-            login.isEnabled = loginState.isDataValid
+            // Disable login button unless both username and password are valid
+            login?.isEnabled = loginState.isDataValid
 
-            if (loginState.usernameError != null) {
-                username.error = getString(loginState.usernameError)
+            loginState.usernameError?.let {
+                username?.error = getString(it)
             }
-            if (loginState.passwordError != null) {
-                password.error = getString(loginState.passwordError)
+            loginState.passwordError?.let {
+                password?.error = getString(it)
             }
         })
 
-        loginViewModel.loginResult.observe(this@LoginActivity, Observer {
-            val loginResult = it ?: return@Observer
+        loginViewModel.loginResult.observe(this@LoginActivity, Observer { loginResult ->
+            loginResult ?: return@Observer
 
-            loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
+            loading?.visibility = View.GONE
+            loginResult.error?.let {
+                showLoginFailed(it)
             }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
+            loginResult.success?.let {
+                updateUiWithUser(it)
             }
             setResult(Activity.RESULT_OK)
 
-            //Complete and destroy login activity once successful
+            // Complete and destroy login activity once successful
             finish()
         })
 
-        username.afterTextChanged {
+        username?.afterTextChanged { text ->
             loginViewModel.loginDataChanged(
-                username.text.toString(),
-                password.text.toString()
+                text,
+                password?.text.toString()
             )
         }
 
-        password.apply {
-            afterTextChanged {
+        password?.apply {
+            afterTextChanged { text ->
                 loginViewModel.loginDataChanged(
-                    username.text.toString(),
-                    password.text.toString()
+                    username?.text.toString(),
+                    text
                 )
             }
 
             setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    EditorInfo.IME_ACTION_DONE ->
-                        loginViewModel.login(
-                            username.text.toString(),
-                            password.text.toString()
-                        )
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    loginViewModel.login(
+                        username?.text.toString(),
+                        text.toString()
+                    )
+                    true
+                } else {
+                    false
                 }
-                false
             }
 
-            login.setOnClickListener {
-                loading.visibility = View.VISIBLE
-                loginViewModel.login(username.text.toString(), password.text.toString())
+            login?.setOnClickListener {
+                loading?.visibility = View.VISIBLE
+                loginViewModel.login(
+                    username?.text.toString(),
+                    text.toString()
+                )
             }
         }
     }
