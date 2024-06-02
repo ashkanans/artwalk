@@ -5,74 +5,71 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/email"
-        android:layout_width="0dp"
+        android:id="@+id/username"
+        android:layout_width="329dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:background="@drawable/edit_text_bg"
-        android:hint="@string/email"
+        android:hint="Username"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13999999"
         app:layout_constraintWidth_percent=".8" />
 
 
     <EditText
         android:id="@+id/number"
-        android:layout_width="0dp"
+        android:layout_width="329dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:background="@drawable/edit_text_bg"
         android:hint="@string/mobile_number"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email"
-        app:layout_constraintVertical_bias=".1"
+        app:layout_constraintTop_toBottomOf="@+id/username"
         app:layout_constraintWidth_percent=".8" />
 
     <EditText
         android:id="@+id/password"
-        android:layout_width="0dp"
+        android:layout_width="329dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:background="@drawable/edit_text_bg"
         android:hint="@string/Password"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/number"
-        app:layout_constraintVertical_bias=".1"
         app:layout_constraintWidth_percent=".8" />
 
     <EditText
         android:id="@+id/confirm_password"
-        android:layout_width="0dp"
+        android:layout_width="329dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:background="@drawable/edit_text_bg"
         android:hint="@string/confirm_password"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias=".1"
         app:layout_constraintWidth_percent=".8" />
 
     <Button
         android:id="@+id/signup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/button_bg"
         android:text="@string/signup"
         android:textColor="@color/white"

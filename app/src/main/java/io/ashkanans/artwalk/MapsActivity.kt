@@ -1,8 +1,13 @@
 package io.ashkanans.artwalk
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -11,13 +16,18 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.provider.MediaStore
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -30,6 +40,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.maps.android.SphericalUtil
 import io.ashkanans.artwalk.databinding.ActivityMapsBinding
 import kotlin.math.atan2
@@ -54,6 +65,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var directionPolygon: Polygon? = null
     private var currentDirectionAngle: Float = 0f
+
+    companion object {
+        private const val REQUEST_IMAGE_CAPTURE = 1
+        private const val REQUEST_CAMERA_PERMISSION = 2
+    }
+
+    private var imageUri: Uri? = null
+
     override fun onResume() {
         super.onResume()
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -165,6 +184,90 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             // Call the method to move the camera to the user's current location
             relocateCameraToCurrentLocation()
         }
+        val captureButton: FloatingActionButton = findViewById(R.id.capture_button)
+        captureButton.setOnClickListener { openCamera() }
+    }
+
+    private fun openCamera() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_CAMERA_PERMISSION
+            )
+        } else {
+            dispatchTakePictureIntent()
+        }
+    }
+
+    private fun dispatchTakePictureIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(packageManager) != null) {
+            imageUri = createImageUri()
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
+    private fun createImageUri(): Uri? {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "new_image.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+        }
+        val resolver = contentResolver
+        return resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    }
+
+    @SuppressLint("MissingSuperCall")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                dispatchTakePictureIntent()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Camera permission is required to use this feature",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            imageUri?.let { uri ->
+                val resolver = contentResolver
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    resolver.update(uri, ContentValues().apply {
+                        put(MediaStore.Images.Media.IS_PENDING, 0)
+                    }, null, null)
+                }
+
+                val imageView: ImageView = findViewById(R.id.imageView)
+                imageView.setImageURI(uri)
+
+                // Process the captured image
+                val bitmap = MediaStore.Images.Media.getBitmap(resolver, uri)
+                processImage(bitmap)
+            }
+        }
+    }
+
+    private fun processImage(imageBitmap: Bitmap) {
+        // Code to process the image and identify the landmark
     }
 
 
