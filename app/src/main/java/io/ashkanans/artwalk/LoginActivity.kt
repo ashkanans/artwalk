@@ -14,6 +14,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -77,12 +78,19 @@ class LoginActivity : AppCompatActivity() {
                         request = request,
                         context = this@LoginActivity,
                     )
+                    Log.e("result.. ===", result.toString())
                     handleSignIn(result)
+                } catch (e: GetCredentialCancellationException) {
+                    Log.e("Google Sign-In", "Sign-In was cancelled by the user", e)
+                    handleFailure(e)
                 } catch (e: GetCredentialException) {
+                    Log.e("Google Sign-In", "An error occurred during sign-in", e)
+                    handleFailure(e)
+                } catch (e: Exception) {
+                    Log.e("Google Sign-In", "An unexpected error occurred", e)
                     handleFailure(e)
                 }
             }
-
         }
     }
 
@@ -114,7 +122,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    private fun handleFailure(e: GetCredentialException) {
+    private fun handleFailure(e: Exception) {
         Log.e(TAG, "Failed to get credentials", e)
     }
 

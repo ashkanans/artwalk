@@ -52,6 +52,10 @@
             android:exported="true"
             android:label="@string/title_activity_maps">
         </activity>
+        <activity
+            android:name=".ImageDetectionActivity"
+            android:exported="true"
+            android:label="@string/title_activity_maps"></activity>
     </application>
 
 </manifest>

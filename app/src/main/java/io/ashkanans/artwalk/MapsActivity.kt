@@ -1,6 +1,5 @@
 package io.ashkanans.artwalk
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
@@ -27,7 +26,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -189,19 +187,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun openCamera() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                REQUEST_CAMERA_PERMISSION
-            )
-        } else {
-            dispatchTakePictureIntent()
-        }
+        startActivity(Intent(this, ImageDetectionActivity::class.java))
     }
 
     private fun dispatchTakePictureIntent() {

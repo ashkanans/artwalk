@@ -51,10 +51,21 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    packagingOptions {
+        excludes += setOf(
+            "META-INF/DEPENDENCIES",
+            "META-INF/LICENSE",
+            "META-INF/LICENSE.txt",
+            "META-INF/license.txt",
+            "META-INF/NOTICE",
+            "META-INF/NOTICE.txt",
+            "META-INF/notice.txt",
+            "META-INF/INDEX.LIST"
+        )
+    }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -87,4 +98,24 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    implementation("com.google.android.gms:play-services-base:18.5.0") {
+        exclude(group = "com.google.guava", module = "guava-jdk5")
+    }
+    implementation("com.google.android.gms:play-services-auth:21.2.0") {
+        exclude(group = "com.google.guava", module = "guava-jdk5")
+    }
+    implementation("com.google.apis:google-api-services-vision:v1-rev16-1.22.0") {
+        exclude(group = "com.google.guava", module = "guava-jdk5")
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
+    implementation("com.google.api-client:google-api-client-android:1.22.0") {
+        exclude(group = "com.google.guava", module = "guava-jdk5")
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
+    implementation("com.google.http-client:google-http-client-gson:1.20.0") {
+        exclude(group = "com.google.guava", module = "guava-jdk5")
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
+    implementation("com.google.cloud:google-cloud-vision:3.42.0")
 }
