@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import io.ashkanans.artwalk.MapsActivity
+import io.ashkanans.artwalk.MainActivity
 import io.ashkanans.artwalk.R
 import services.api.authentication.signin.SignIn
 
@@ -62,7 +62,7 @@ class LogintabFragment : Fragment() {
             validateLogin { isValid ->
                 if (isValid) {
                     // If valid, start MapsActivity
-                    val intent = Intent(requireContext(), MapsActivity::class.java)
+                    val intent = Intent(requireContext(), MainActivity::class.java)
                     startActivity(intent)
                     requireActivity().finish() // Finish LoginActivity
                 } else {

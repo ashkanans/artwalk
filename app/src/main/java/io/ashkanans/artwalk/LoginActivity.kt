@@ -105,7 +105,7 @@ class LoginActivity : AppCompatActivity() {
                             GoogleIdTokenCredential.createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
 
-                        startActivity(Intent(this, MapsActivity::class.java))
+                        startActivity(Intent(this, MainActivity::class.java))
                         finish()
                     } catch (e: GoogleIdTokenParsingException) {
                         Log.e(TAG, "Received an invalid google id token response", e)

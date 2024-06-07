@@ -20,8 +20,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -38,7 +36,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.maps.android.SphericalUtil
 import io.ashkanans.artwalk.databinding.ActivityMapsBinding
 import kotlin.math.atan2
@@ -176,14 +173,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         this.permission= isLocationPermissionGranted()
 
-        // Set onClickListener for the relocate button
-        val relocateButton: ImageButton = findViewById(R.id.relocate_button)
-        relocateButton.setOnClickListener {
-            // Call the method to move the camera to the user's current location
-            relocateCameraToCurrentLocation()
-        }
-        val captureButton: FloatingActionButton = findViewById(R.id.capture_button)
-        captureButton.setOnClickListener { openCamera() }
+//        // Set onClickListener for the relocate button
+//        val relocateButton: ImageButton = findViewById(R.id.relocate_button)
+//        relocateButton.setOnClickListener {
+//            // Call the method to move the camera to the user's current location
+//            relocateCameraToCurrentLocation()
+//        }
+//        val captureButton: FloatingActionButton = findViewById(R.id.capture_button)
+//        captureButton.setOnClickListener { openCamera() }
     }
 
     private fun openCamera() {
@@ -242,12 +239,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }, null, null)
                 }
 
-                val imageView: ImageView = findViewById(R.id.imageView)
-                imageView.setImageURI(uri)
+//                val imageView: ImageView = findViewById(R.id.imageView)
+//                imageView.setImageURI(uri)
 
-                // Process the captured image
-                val bitmap = MediaStore.Images.Media.getBitmap(resolver, uri)
-                processImage(bitmap)
+//                // Process the captured image
+//                val bitmap = MediaStore.Images.Media.getBitmap(resolver, uri)
+//                processImage(bitmap)
             }
         }
     }
