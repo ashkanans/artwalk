@@ -1,12 +1,8 @@
 package io.ashkanans.artwalk
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -15,15 +11,15 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.provider.MediaStore
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -37,14 +33,13 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.SphericalUtil
-import io.ashkanans.artwalk.databinding.ActivityMapsBinding
+import io.ashkanans.artwalk.databinding.FragmentMapsBinding
 import kotlin.math.atan2
 
-
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var binding: ActivityMapsBinding
+    private lateinit var binding: FragmentMapsBinding
     private lateinit var locationManager: LocationManager
     private var currentLocation: Location? = null
 
@@ -53,7 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private var permission: Boolean = false;
+    private var permission: Boolean = false
 
     private lateinit var sensorManager: SensorManager
     private var magnetometer: Sensor? = null
@@ -66,14 +61,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val REQUEST_CAMERA_PERMISSION = 2
     }
 
-    private var imageUri: Uri? = null
-
     override fun onResume() {
         super.onResume()
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         magnetometer?.let {
-            sensorManager.registerListener(magnetometerListener, it, SensorManager.SENSOR_DELAY_NORMAL)
+            sensorManager.registerListener(
+                magnetometerListener,
+                it,
+                SensorManager.SENSOR_DELAY_NORMAL
+            )
         }
     }
 
@@ -156,100 +153,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         currentDirectionAngle = newDirection
     }
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        binding = ActivityMapsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentMapsBinding.inflate(inflater, container, false)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
+        val mapFragment = childFragmentManager
             .findFragmentById(R.id.location_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         // Initialize Fused Location Provider client
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
-        this.permission= isLocationPermissionGranted()
+        this.permission = isLocationPermissionGranted()
 
-//        // Set onClickListener for the relocate button
-//        val relocateButton: ImageButton = findViewById(R.id.relocate_button)
-//        relocateButton.setOnClickListener {
-//            // Call the method to move the camera to the user's current location
-//            relocateCameraToCurrentLocation()
-//        }
-//        val captureButton: FloatingActionButton = findViewById(R.id.capture_button)
-//        captureButton.setOnClickListener { openCamera() }
-    }
+        relocateCameraToCurrentLocation()
 
-
-    private fun dispatchTakePictureIntent() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            imageUri = createImageUri()
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        binding.relocateButton.setOnClickListener {
+            relocateCameraToCurrentLocation()
         }
+        return binding.root
     }
-
-    private fun createImageUri(): Uri? {
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "new_image.jpg")
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Images.Media.IS_PENDING, 1)
-            }
-        }
-        val resolver = contentResolver
-        return resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-    }
-
-    @SuppressLint("MissingSuperCall")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                dispatchTakePictureIntent()
-            } else {
-                Toast.makeText(
-                    this,
-                    "Camera permission is required to use this feature",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            imageUri?.let { uri ->
-                val resolver = contentResolver
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    resolver.update(uri, ContentValues().apply {
-                        put(MediaStore.Images.Media.IS_PENDING, 0)
-                    }, null, null)
-                }
-
-//                val imageView: ImageView = findViewById(R.id.imageView)
-//                imageView.setImageURI(uri)
-
-//                // Process the captured image
-//                val bitmap = MediaStore.Images.Media.getBitmap(resolver, uri)
-//                processImage(bitmap)
-            }
-        }
-    }
-
-    private fun processImage(imageBitmap: Bitmap) {
-        // Code to process the image and identify the landmark
-    }
-
 
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("MissingPermission")
@@ -257,10 +183,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Initialize location manager
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (this.permission) {
-
             // Request location updates for Network provider
             locationManager.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER,
@@ -392,7 +318,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }, updateInterval)
     }
 
-    private fun getBestLocation(gpsLocation: Location?, networkLocation: Location?, fusedLocation: Location?): Location? {
+    private fun getBestLocation(
+        gpsLocation: Location?,
+        networkLocation: Location?,
+        fusedLocation: Location?
+    ): Location? {
         // Choose the best location based on accuracy
         var bestLocation: Location? = null
 
@@ -411,19 +341,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return bestLocation
     }
 
-
-
     private fun isLocationPermissionGranted(): Boolean {
         return if (ActivityCompat.checkSelfPermission(
-                this,
+                requireContext(),
                 android.Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
+                requireContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                this,
+                requireActivity(),
                 arrayOf(
                     android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
@@ -435,5 +363,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
     }
-
 }

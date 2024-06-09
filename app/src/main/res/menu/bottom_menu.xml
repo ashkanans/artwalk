@@ -2,14 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/home"
-        android:icon="@drawable/icons8_home_24"
-        android:title="Home" />
+        android:id="@+id/map"
+        android:icon="@drawable/baseline_map_24"
+        android:title="Map" />
 
     <item
         android:id="@+id/shorts"
         android:icon="@drawable/icons8_home_24"
         android:title="Shorts" />
+
+    <item android:title="" />
 
     <item
         android:id="@+id/library"
@@ -17,7 +19,7 @@
         android:title="Library" />
 
     <item
-        android:id="@+id/subscription"
-        android:icon="@drawable/icons8_home_24"
-        android:title="Subscription" />
+        android:id="@+id/image_detection"
+        android:icon="@drawable/baseline_image_search_24"
+        android:title="Detect" />
 </menu>

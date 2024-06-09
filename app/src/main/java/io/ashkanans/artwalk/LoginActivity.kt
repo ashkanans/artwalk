@@ -130,7 +130,4 @@ class LoginActivity : AppCompatActivity() {
         return UUID.randomUUID().toString()
     }
 
-//    fun signOut() {
-//        CredentialManager.clearCredentialState(this@LoginActivity, WEB_CLIENT_ID)
-//    }
 }

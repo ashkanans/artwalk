@@ -1,6 +1,7 @@
 package io.ashkanans.artwalk
 
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -24,42 +25,39 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var fab: FloatingActionButton
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        drawerLayout = findViewById(R.id.drawer_layout)
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
-
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar,
-            R.string.open_nav, R.string.close_nav
+            this,
+            drawerLayout,
+            toolbar,
+            R.string.open_nav,
+            R.string.close_nav
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, HomeFragment()).commit()
+                .replace(R.id.fragment_container, HomeFragment()).commit()
             navigationView.setCheckedItem(R.id.nav_home)
         }
-
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView.background = null;
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.home -> replaceFragment(HomeFragment())
+                R.id.map -> replaceFragment(MapsFragment())
                 R.id.shorts -> replaceFragment(ShortsFragment())
                 R.id.library -> replaceFragment(LibraryFragment())
-                R.id.subscription -> replaceFragment(SubscriptionFragment())
+                R.id.image_detection -> replaceFragment(SubscriptionFragment())
             }
             true
         }
@@ -74,7 +72,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_settings -> replaceFragment(SettingsFragment())
             R.id.nav_share -> replaceFragment(ShareFragment())
             R.id.nav_about -> replaceFragment(AboutFragment())
-            R.id.nav_logout -> Toast.makeText(this, "Logout!", Toast.LENGTH_SHORT).show()
+            R.id.nav_logout -> startActivity(Intent(this, LoginActivity::class.java))
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
@@ -91,7 +89,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.frame_layout, fragment)
+        fragmentTransaction.replace(R.id.fragment_container, fragment)
         fragmentTransaction.commit()
     }
 
@@ -102,7 +100,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val videoLayout = dialog.findViewById<LinearLayout>(R.id.layoutVideo)
         val shortsLayout = dialog.findViewById<LinearLayout>(R.id.layoutShorts)
-        val liveLayout = dialog.findViewById<LinearLayout>(R.id.layoutLive)
         val cancelButton = dialog.findViewById<ImageView>(R.id.cancelButton)
 
         videoLayout.setOnClickListener {
@@ -113,11 +110,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         shortsLayout.setOnClickListener {
             dialog.dismiss()
             Toast.makeText(this, "Create a short is clicked", Toast.LENGTH_SHORT).show()
-        }
-
-        liveLayout.setOnClickListener {
-            dialog.dismiss()
-            Toast.makeText(this, "Go live is clicked", Toast.LENGTH_SHORT).show()
         }
 
         cancelButton.setOnClickListener {
@@ -131,5 +123,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             attributes.windowAnimations = R.style.DialogAnimation
             setGravity(Gravity.BOTTOM)
         }
+    }
+
+    fun onTokenReceived(it: String) {
+
     }
 }

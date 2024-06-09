@@ -24,7 +24,7 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="5dp"
             android:padding="8dp"
-            android:text="Create"
+            android:text="Upload an image"
             android:textAlignment="viewStart"
             android:textColor="@color/lavender"
             android:textSize="25dp" />
@@ -51,13 +51,13 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icons8_home_24" />
+            android:src="@drawable/baseline_add_a_photo_24" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:text="Upload a video"
+            android:text="Take a photo"
             android:textColor="@color/lavender"
             android:textSize="16sp" />
 
@@ -74,42 +74,17 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/whatshot" />
+            android:src="@drawable/baseline_photo_library_24" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:text="Create a short"
+            android:text="Upload from gallery"
             android:textColor="@color/lavender"
             android:textSize="16sp" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/layoutLive"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingTop="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="30dp">
-
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/icons8_home_24" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:text="Go live"
-            android:textColor="@color/lavender"
-            android:textSize="16sp" />
-
-    </LinearLayout>
 
 </LinearLayout>
