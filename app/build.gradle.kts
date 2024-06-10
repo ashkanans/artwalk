@@ -117,5 +117,8 @@ dependencies {
         exclude(group = "com.google.guava", module = "guava-jdk5")
         exclude(group = "com.google.guava", module = "listenablefuture")
     }
-    implementation("com.google.cloud:google-cloud-vision:3.42.0")
+    implementation(libs.google.cloud.vision)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx.v251)
+    implementation(libs.androidx.lifecycle.livedata.ktx.v251)
+    implementation(libs.androidx.fragment.ktx)
 }

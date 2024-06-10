@@ -47,7 +47,12 @@ class GetOAuthToken(
             accessToken = GoogleAuthUtil.getToken(mContext, mAccount, mScope)
             accessToken
         } catch (userRecoverableException: UserRecoverableAuthException) {
-            mFragment.startActivityForResult(userRecoverableException.intent, mRequestCode)
+            userRecoverableException.intent?.let {
+                mFragment.startActivityForResult(
+                    it,
+                    mRequestCode
+                )
+            }
             null
         } catch (fatalException: GoogleAuthException) {
             fatalException.printStackTrace()

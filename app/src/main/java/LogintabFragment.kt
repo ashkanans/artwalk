@@ -1,9 +1,11 @@
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -19,6 +21,8 @@ class LogintabFragment : Fragment() {
     private var loginClickListener: OnLoginClickListener? = null
     private val baseUrl = "http://46.100.50.100:63938/"
     private val signInService = SignIn(baseUrl)
+    private lateinit var showPasswordButton: Button
+    private var passwordVisible = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,6 +30,8 @@ class LogintabFragment : Fragment() {
     ): View {
         val root = inflater.inflate(R.layout.login_tab_fragment, container, false)
 
+
+        showPasswordButton = root.findViewById(R.id.show_password)
         username = root.findViewById(R.id.username)
         pass = root.findViewById(R.id.password)
         forgetPass = root.findViewById(R.id.forget_pass)
@@ -37,16 +43,24 @@ class LogintabFragment : Fragment() {
         pass.translationX = 800f
         forgetPass.translationX = 800f
         login.translationX = 800f
+        showPasswordButton.translationX = 800f
 
         username.alpha = v
         pass.alpha = v
         forgetPass.alpha = v
         login.alpha = v
+        showPasswordButton.alpha = v
 
         username.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(300).start()
         pass.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(500).start()
         forgetPass.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(500).start()
         login.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(700).start()
+        showPasswordButton.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(700)
+            .start()
+
+        showPasswordButton.setOnClickListener {
+            togglePasswordVisibility()
+        }
 
         return root
     }
@@ -76,6 +90,20 @@ class LogintabFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun togglePasswordVisibility() {
+
+        if (passwordVisible) {
+            pass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            showPasswordButton.text = "Show"
+        } else {
+            pass.inputType =
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            showPasswordButton.text = "Hide"
+        }
+        pass.setSelection(pass.text.length) // Move cursor to the end
+        passwordVisible = !passwordVisible
     }
 
     private fun validateLogin(callback: (Boolean) -> Unit) {
