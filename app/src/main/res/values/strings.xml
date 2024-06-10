@@ -1,4 +1,9 @@
 <resources>
+    <string-array name="theme_array">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System Default</item>
+    </string-array>
     <string name="app_name">ArtWalk</string>
     <string name="title_activity_maps">ArtWalk</string>
     <string name="title_activity_login">LoginActivity</string>

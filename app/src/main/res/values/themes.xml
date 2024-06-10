@@ -1,20 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- Base application theme -->
     <style name="Theme.ArtWalk" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!--        Primary Brand Color-->
+        <!-- Primary Brand Color-->
         <item name="colorPrimary">@color/lavender</item>
         <item name="colorPrimaryVariant">@color/lavender</item>
         <item name="colorOnPrimary">@color/white</item>
 
-        <!--        Secondary Brand Color-->
+        <!-- Secondary Brand Color-->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <!--        Status bar color-->
+        <!-- Status bar color-->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
 
+    <!-- Light Theme -->
+    <style name="Theme.ArtWalk.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary Brand Color-->
+        <item name="colorPrimary">@color/lavender</item>
+        <item name="colorPrimaryVariant">@color/lavender</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Secondary Brand Color-->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Status bar color-->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <!-- Dark Theme -->
+    <style name="Theme.ArtWalk.Dark" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <!-- Primary Brand Color-->
+        <item name="colorPrimary">@color/lavender</item>
+        <item name="colorPrimaryVariant">@color/lavender</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Secondary Brand Color-->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Status bar color-->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     </style>
 
     <style name="DialogAnimation">
