@@ -34,7 +34,7 @@ class LibraryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_library, container, false)
+        return inflater.inflate(R.layout.fragment_shorts, container, false)
     }
 
     companion object {
@@ -44,7 +44,7 @@ class LibraryFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment LibraryFragment.
+         * @return A new instance of fragment ShortsFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic

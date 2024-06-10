@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
+    id("com.google.devtools.ksp") version "1.9.21-1.0.15"
 }
 
 android {
@@ -121,4 +122,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx.v251)
     implementation(libs.androidx.lifecycle.livedata.ktx.v251)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.glide)
+    implementation(libs.roundedimageview)
+    ksp("androidx.room:room-compiler:2.6.1")
 }
