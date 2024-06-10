@@ -2,12 +2,13 @@ package io.ashkanans.artwalk
 
 import LoginAdapter
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.credentials.GetCredentialException
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.credentials.CredentialManager
@@ -29,12 +30,14 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
     private lateinit var google: FloatingActionButton
-    private lateinit var loginButton: Button
+    private lateinit var sharedPreferences: SharedPreferences
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
         tabLayout = findViewById(R.id.tab_layout)
         viewPager = findViewById(R.id.view_pager)
@@ -105,6 +108,7 @@ class LoginActivity : AppCompatActivity() {
                             GoogleIdTokenCredential.createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
 
+                        saveLoginState()
                         startActivity(Intent(this, MainActivity::class.java))
                         finish()
                     } catch (e: GoogleIdTokenParsingException) {
@@ -121,6 +125,12 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveLoginState() {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("is_logged_in", true)
+        editor.apply()
+    }
+
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun handleFailure(e: Exception) {
         Log.e(TAG, "Failed to get credentials", e)
@@ -129,5 +139,4 @@ class LoginActivity : AppCompatActivity() {
     private fun generateNonce(): String {
         return UUID.randomUUID().toString()
     }
-
 }

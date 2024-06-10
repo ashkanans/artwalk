@@ -1,7 +1,9 @@
 package io.ashkanans.artwalk
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -30,8 +32,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var fab: FloatingActionButton
     private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var sharedPreferences: SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+        if (!checkIfLoggedIn()) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
+        val theme = ThemeUtils.getThemePreference(this)
+        ThemeUtils.applyTheme(theme)
+
         setContentView(R.layout.activity_main)
         drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -71,6 +86,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         sharedViewModel.navigateToFragment.observe(this) { fragmentClass ->
             fragmentClass?.let { replaceFragment(it.newInstance()) }
         }
+    }
+
+    private fun logoutUser() {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("is_logged_in", false)
+        editor.apply()
+    }
+
+    private fun checkIfLoggedIn(): Boolean {
+        return sharedPreferences.getBoolean("is_logged_in", false)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

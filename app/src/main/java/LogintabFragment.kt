@@ -1,4 +1,6 @@
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -13,16 +15,16 @@ import io.ashkanans.artwalk.MainActivity
 import io.ashkanans.artwalk.R
 import services.api.authentication.signin.SignIn
 
-class LogintabFragment : Fragment() {
+class LoginTabFragment : Fragment() {
     private lateinit var username: EditText
     private lateinit var pass: EditText
     private lateinit var forgetPass: View
     private lateinit var login: View
     private var loginClickListener: OnLoginClickListener? = null
-    private val baseUrl = "http://46.100.50.100:63938/"
-    private val signInService = SignIn(baseUrl)
     private lateinit var showPasswordButton: Button
-    private var passwordVisible = true
+    private var passwordVisible = false
+    private lateinit var sharedPreferences: SharedPreferences
+    private val signInService = SignIn("http://46.100.50.100:63938/")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +32,8 @@ class LogintabFragment : Fragment() {
     ): View {
         val root = inflater.inflate(R.layout.login_tab_fragment, container, false)
 
+        sharedPreferences =
+            requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
         showPasswordButton = root.findViewById(R.id.show_password)
         username = root.findViewById(R.id.username)
@@ -62,11 +66,8 @@ class LogintabFragment : Fragment() {
             togglePasswordVisibility()
         }
 
+        pass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         return root
-    }
-
-    fun setOnLoginClickListener(listener: OnLoginClickListener) {
-        loginClickListener = listener
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,7 +76,8 @@ class LogintabFragment : Fragment() {
         login.setOnClickListener {
             validateLogin { isValid ->
                 if (isValid) {
-                    // If valid, start MapsActivity
+                    // If valid, update login state and start MainActivity
+                    saveLoginState(true)
                     val intent = Intent(requireContext(), MainActivity::class.java)
                     startActivity(intent)
                     requireActivity().finish() // Finish LoginActivity
@@ -93,7 +95,6 @@ class LogintabFragment : Fragment() {
     }
 
     private fun togglePasswordVisibility() {
-
         if (passwordVisible) {
             pass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             showPasswordButton.text = "Show"
@@ -120,5 +121,11 @@ class LogintabFragment : Fragment() {
                 callback(false)
             }
         }
+    }
+
+    private fun saveLoginState(isLoggedIn: Boolean) {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("is_logged_in", isLoggedIn)
+        editor.apply()
     }
 }

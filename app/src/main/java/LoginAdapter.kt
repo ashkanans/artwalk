@@ -15,7 +15,7 @@ class LoginAdapter(
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> LogintabFragment()
+            0 -> LoginTabFragment()
             1 -> SignuptabFragment()
             else -> throw IllegalArgumentException("Invalid position")
         }

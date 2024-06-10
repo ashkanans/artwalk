@@ -4,20 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.RelativeLayout
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SettingsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 
 class SettingsFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModels()
@@ -31,6 +23,30 @@ class SettingsFragment : Fragment() {
         val aboutButton: RelativeLayout = view.findViewById(R.id.layout_about)
         aboutButton.setOnClickListener {
             sharedViewModel.navigateTo(AboutFragment::class.java)
+        }
+
+        val themeSpinner: Spinner = view.findViewById(R.id.spinner_theme)
+        val themes = listOf("System Default", "Light", "Dark")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, themes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        themeSpinner.adapter = adapter
+
+        // Set the spinner to the current theme
+        val currentTheme = ThemeUtils.getThemePreference(requireContext())
+        themeSpinner.setSelection(currentTheme)
+
+        themeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                ThemeUtils.saveThemePreference(requireContext(), position)
+                ThemeUtils.applyTheme(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
         return view
