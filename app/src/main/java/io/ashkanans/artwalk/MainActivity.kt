@@ -92,6 +92,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val editor = sharedPreferences.edit()
         editor.putBoolean("is_logged_in", false)
         editor.apply()
+        startActivity(Intent(this, LoginActivity::class.java))
+        // Finish MainActivity
+        finish()
     }
 
     private fun checkIfLoggedIn(): Boolean {
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_settings -> sharedViewModel.navigateTo(SettingsFragment::class.java)
             R.id.nav_share -> sharedViewModel.navigateTo(ShareFragment::class.java)
             R.id.nav_about -> sharedViewModel.navigateTo(AboutFragment::class.java)
-            R.id.nav_logout -> startActivity(Intent(this, LoginActivity::class.java))
+            R.id.nav_logout -> logoutUser()
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
@@ -157,7 +160,4 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    fun onTokenReceived(it: String) {
-
-    }
 }
