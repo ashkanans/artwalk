@@ -20,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var fab: FloatingActionButton
+    private lateinit var sharedViewModel: SharedViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -64,14 +66,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         fab = findViewById(R.id.fab)
         fab.setOnClickListener { showBottomDialog() }
+
+        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        sharedViewModel.navigateToFragment.observe(this) { fragmentClass ->
+            fragmentClass?.let { replaceFragment(it.newInstance()) }
+        }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_home -> replaceFragment(HomeFragment())
-            R.id.nav_settings -> replaceFragment(SettingsFragment())
-            R.id.nav_share -> replaceFragment(ShareFragment())
-            R.id.nav_about -> replaceFragment(AboutFragment())
+            R.id.nav_home -> sharedViewModel.navigateTo(HomeFragment::class.java)
+            R.id.nav_settings -> sharedViewModel.navigateTo(SettingsFragment::class.java)
+            R.id.nav_share -> sharedViewModel.navigateTo(ShareFragment::class.java)
+            R.id.nav_about -> sharedViewModel.navigateTo(AboutFragment::class.java)
             R.id.nav_logout -> startActivity(Intent(this, LoginActivity::class.java))
         }
         drawerLayout.closeDrawer(GravityCompat.START)
