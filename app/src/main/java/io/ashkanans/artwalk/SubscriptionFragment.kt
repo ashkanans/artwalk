@@ -1,5 +1,6 @@
 package io.ashkanans.artwalk
 
+import CloudVisionManager
 import android.Manifest
 import android.accounts.Account
 import android.accounts.AccountManager
@@ -56,6 +57,8 @@ class SubscriptionFragment : Fragment() {
     private lateinit var landmarkResults: TextView
     private var mAccount: Account? = null
     private lateinit var mProgressDialog: ProgressDialog
+
+    private lateinit var cloudVisionManager: CloudVisionManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -149,8 +152,14 @@ class SubscriptionFragment : Fragment() {
                         uri
                     )
                 )
-                callCloudVision(bitmap)
                 selectedImage.setImageBitmap(bitmap)
+                cloudVisionManager.detectImage(
+                    bitmap,
+                    onLabelsDetected = { labels -> labelResults.text = labels },
+                    onTextsDetected = { texts -> textResults.text = texts },
+                    onLandmarksDetected = { landmarks -> landmarkResults.text = landmarks },
+                    onError = { error -> Toast.makeText(context, error, Toast.LENGTH_SHORT).show() }
+                )
             } catch (e: IOException) {
                 Log.e(TAG, e.message ?: "IOException occurred")
             }
@@ -345,6 +354,7 @@ class SubscriptionFragment : Fragment() {
 
     fun onTokenReceived(token: String?) {
         accessToken = token
+        cloudVisionManager = CloudVisionManager(token!!)
         launchImagePicker()
     }
 
