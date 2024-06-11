@@ -1,7 +1,11 @@
 package io.ashkanans.artwalk
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,10 +21,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.makeramen.roundedimageview.RoundedImageView
 
-
 class GalleryFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var imageAdapter: ImageAdapter
+    private val REQUEST_GALLERY_IMAGE = 100
+    private val REQUEST_PERMISSIONS = 13
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +53,67 @@ class GalleryFragment : Fragment() {
                 imageAdapter.updateImages(it.map { uri -> uri.toString() })
             }
         })
+
+        // Set click listener to open image picker
+        view.findViewById<View>(R.id.staggeredImages).setOnClickListener {
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_PERMISSIONS
+            )
+        }
+    }
+
+    private fun launchImagePicker() {
+        val intent = Intent().apply {
+            type = "image/*"
+            action = Intent.ACTION_GET_CONTENT
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        }
+        startActivityForResult(
+            Intent.createChooser(intent, "Select images"),
+            REQUEST_GALLERY_IMAGE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_PERMISSIONS -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchImagePicker()
+            } else {
+                Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_GALLERY_IMAGE -> if (resultCode == Activity.RESULT_OK && data != null) {
+                val clipData = data.clipData
+                val selectedUris = mutableListOf<Uri>()
+
+                if (clipData != null) {
+                    for (i in 0 until clipData.itemCount) {
+                        clipData.getItemAt(i).uri?.let {
+                            selectedUris.add(it)
+                        }
+                    }
+                } else {
+                    data.data?.let {
+                        selectedUris.add(it)
+                    }
+                }
+
+                if (selectedUris.isNotEmpty()) {
+                    sharedViewModel.appendImages(selectedUris)
+                }
+            }
+        }
     }
 
     private class ImageAdapter(
