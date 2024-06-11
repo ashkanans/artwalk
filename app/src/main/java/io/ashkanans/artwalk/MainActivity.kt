@@ -1,14 +1,18 @@
 package io.ashkanans.artwalk
 
+import android.Manifest
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -20,6 +24,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -29,6 +36,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
@@ -37,6 +49,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var sharedPreferences: SharedPreferences
     val REQUEST_CODE_GALLERY = 123
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_PERMISSIONS = 13
+    private var photoUri: Uri? = null
+    private lateinit var currentPhotoPath: String
 
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
@@ -152,7 +168,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         takePhotoLayout.setOnClickListener {
             dialog.dismiss()
-            Toast.makeText(this, "Take a photo is clicked", Toast.LENGTH_SHORT).show()
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.CAMERA
+                ) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    REQUEST_PERMISSIONS
+                )
+            } else {
+                dispatchTakePictureIntent()
+            }
         }
 
         uploadGalleryLayout.setOnClickListener {
@@ -173,12 +205,71 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    null
+                }
+                photoFile?.also {
+                    photoUri = FileProvider.getUriForFile(
+                        this,
+                        "io.ashkanans.artwalk.fileprovider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Correct usage
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+                }
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val storageDir: File =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_",
+            ".jpg",
+            storageDir
+        ).apply {
+            currentPhotoPath = absolutePath
+        }
+    }
+
     private fun openGalleryAndSelectImages() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         startActivityForResult(intent, REQUEST_CODE_GALLERY)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_PERMISSIONS -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // Permission granted, proceed with the action
+                    dispatchTakePictureIntent()
+                } else {
+                    // Permission denied, show a message to the user
+                    Toast.makeText(
+                        this,
+                        "Permissions required to use this feature",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -201,10 +292,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             // Append selected images to the shared ViewModel
             sharedViewModel.appendImages(selectedImages)
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            photoUri?.let {
+                // Notify the media scanner about the new image to make it available in the gallery
+                val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                mediaScanIntent.data = it
+                sendBroadcast(mediaScanIntent)
+                Toast.makeText(this, "Image saved to gallery", Toast.LENGTH_SHORT).show()
+
+                // Append the captured image URI to the shared ViewModel
+                sharedViewModel.appendImages(listOf(it))
+            }
         }
     }
 
-    private fun openGallery() {
-        galleryLauncher.launch("image/*")
-    }
 }

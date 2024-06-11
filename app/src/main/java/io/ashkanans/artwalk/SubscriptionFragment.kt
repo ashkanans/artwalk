@@ -39,8 +39,9 @@ class SubscriptionFragment : Fragment() {
     private lateinit var textResults: TextView
     private lateinit var landmarkResults: TextView
     private var mAccount: Account? = null
-    private lateinit var mProgressDialog: ProgressDialog
     private lateinit var cloudVisionManager: CloudVisionManager
+
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,7 +67,11 @@ class SubscriptionFragment : Fragment() {
             )
         }
 
-        // Return the root view of the binding
+        progressDialog = ProgressDialog(context).apply {
+            setMessage("Processing Image...")
+            setCancelable(false)
+        }
+
         return binding.root
     }
 
