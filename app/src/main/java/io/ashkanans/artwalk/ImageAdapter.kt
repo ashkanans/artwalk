@@ -9,8 +9,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
-class ImageAdapter(private val imageUris: Map<String, List<Bitmap>>) :
-    RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
+class ImageAdapter(
+    private val imageUris: Map<String, List<Bitmap>>,
+    private val onItemClicked: (String) -> Unit
+) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.recyclerImage)
@@ -26,10 +28,7 @@ class ImageAdapter(private val imageUris: Map<String, List<Bitmap>>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val entry = imageUris.entries.elementAtOrNull(position)
 
-        // Check if entry is null or empty
         if (entry == null || entry.value.isEmpty()) {
-            // Handle case where entry is null or empty (no URIs to display)
-            // Clear the image view and caption
             Glide.with(holder.imageView.context).clear(holder.imageView)
             holder.caption.text = ""
             return
@@ -38,11 +37,13 @@ class ImageAdapter(private val imageUris: Map<String, List<Bitmap>>) :
         val caption = entry.key
         val uriList = entry.value
 
-        // Load the first image URI from the list
         Glide.with(holder.imageView.context).load(uriList[0]).into(holder.imageView)
-
-        // Set caption
         holder.caption.text = caption
+
+        // Set the click listener on the itemView
+        holder.itemView.setOnClickListener {
+            onItemClicked(caption)
+        }
     }
 
     override fun getItemCount(): Int = imageUris.size

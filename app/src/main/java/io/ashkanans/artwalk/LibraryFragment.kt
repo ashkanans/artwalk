@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
-
 class LibraryFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var recyclerView: RecyclerView
@@ -34,8 +33,22 @@ class LibraryFragment : Fragment() {
 
         // Observe the imageUris LiveData and update the RecyclerView
         sharedViewModel.mapStringToImageUris.observe(viewLifecycleOwner) { uris ->
-            adapter = ImageAdapter(uris)
+            adapter = ImageAdapter(uris) { caption ->
+                openLibraryDashboardFragment(caption)
+            }
             recyclerView.adapter = adapter
         }
+    }
+
+    private fun openLibraryDashboardFragment(caption: String) {
+        val fragment = LibraryDashboardFragment().apply {
+            arguments = Bundle().apply {
+                putString("CAPTION", caption)
+            }
+        }
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }
