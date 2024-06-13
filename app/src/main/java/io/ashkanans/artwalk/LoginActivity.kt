@@ -1,40 +1,44 @@
 package io.ashkanans.artwalk
 
 import LoginAdapter
+import android.Manifest
+import android.accounts.Account
+import android.accounts.AccountManager
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.credentials.GetCredentialException
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.google.android.gms.auth.GoogleAuthUtil
+import com.google.android.gms.common.AccountPicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.launch
-import java.util.UUID
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var sharedViewModel: SharedViewModel
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
     private lateinit var google: FloatingActionButton
     private lateinit var sharedPreferences: SharedPreferences
+    private val REQUEST_PERMISSIONS = 13
+    private val REQUEST_ACCOUNT_AUTHORIZATION = 102
+    private val REQUEST_CODE_PICK_ACCOUNT = 101
+    private var mAccount: Account? = null
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+
         setContentView(R.layout.activity_login)
 
         sharedPreferences = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
@@ -60,74 +64,86 @@ class LoginActivity : AppCompatActivity() {
 
         // Set up Google Sign-In
         google.setOnClickListener {
-            val WEB_CLIENT_ID =
-                "904815380413-g5jfhmjbflmv4d24ejnbdo0qqtmrnjbp.apps.googleusercontent.com"
-            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(WEB_CLIENT_ID)
-                .setAutoSelectEnabled(true)
-                .setNonce(generateNonce())
-                .build()
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.GET_ACCOUNTS,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ),
+                REQUEST_PERMISSIONS
+            )
+        }
+    }
 
-            val request: GetCredentialRequest = GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build()
-
-            val credentialManager = CredentialManager.create(this@LoginActivity)
-            lifecycleScope.launch {
-                try {
-                    Log.e("request.. ===", request.toString())
-                    val result = credentialManager.getCredential(
-                        request = request,
-                        context = this@LoginActivity,
-                    )
-                    Log.e("result.. ===", result.toString())
-                    handleSignIn(result)
-                } catch (e: GetCredentialCancellationException) {
-                    Log.e("Google Sign-In", "Sign-In was cancelled by the user", e)
-                    handleFailure(e)
-                } catch (e: GetCredentialException) {
-                    Log.e("Google Sign-In", "An error occurred during sign-in", e)
-                    handleFailure(e)
-                } catch (e: Exception) {
-                    Log.e("Google Sign-In", "An unexpected error occurred", e)
-                    handleFailure(e)
-                }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_PERMISSIONS -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getAuthToken()
+            } else {
+                Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun handleSignIn(result: GetCredentialResponse) {
-        val credential = result.credential
+    private fun getAuthToken() {
+        val SCOPE = "oauth2:https://www.googleapis.com/auth/cloud-platform"
+        if (mAccount == null) {
+            pickUserAccount()
+        } else {
+            GetOAuthToken(this, mAccount!!, SCOPE, REQUEST_ACCOUNT_AUTHORIZATION).execute()
+        }
+    }
 
-        when (credential) {
-            is CustomCredential -> {
-                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    try {
-                        val googleIdTokenCredential =
-                            GoogleIdTokenCredential.createFrom(credential.data)
-                        val idToken = googleIdTokenCredential.idToken
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
 
-                        saveLoginState()
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
-                    } catch (e: GoogleIdTokenParsingException) {
-                        Log.e(TAG, "Received an invalid google id token response", e)
+            REQUEST_CODE_PICK_ACCOUNT -> if (resultCode == RESULT_OK) {
+                val email = data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                val am = AccountManager.get(this)
+                val accounts = am.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE)
+                for (account in accounts) {
+                    if (account.name == email) {
+                        mAccount = account
+                        break
                     }
-                } else {
-                    Log.e(TAG, "Unexpected type of credential")
                 }
+                getAuthToken()
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "No Account Selected", Toast.LENGTH_SHORT).show()
             }
 
-            else -> {
-                Log.e(TAG, "Unexpected type of credential")
+            REQUEST_ACCOUNT_AUTHORIZATION -> if (resultCode == RESULT_OK) {
+                val extra = data?.extras
+                extra?.getString("authtoken")?.let { onTokenReceived(it) }
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Authorization Failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun saveLoginState() {
+    private fun pickUserAccount() {
+        val accountTypes = arrayOf(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE)
+        val intent = AccountPicker.newChooseAccountIntent(
+            null,
+            null,
+            accountTypes,
+            false,
+            null,
+            null,
+            null,
+            null
+        )
+        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT)
+    }
+
+    private fun saveLoginState(isLoggedIn: Boolean) {
         val editor = sharedPreferences.edit()
-        editor.putBoolean("is_logged_in", true)
+        editor.putBoolean("is_logged_in", isLoggedIn)
         editor.apply()
     }
 
@@ -136,7 +152,11 @@ class LoginActivity : AppCompatActivity() {
         Log.e(TAG, "Failed to get credentials", e)
     }
 
-    private fun generateNonce(): String {
-        return UUID.randomUUID().toString()
+    fun onTokenReceived(token: String) {
+        sharedViewModel.saveToken(this, token)
+        saveLoginState(true)
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        this.finish()
     }
 }

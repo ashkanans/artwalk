@@ -12,12 +12,15 @@ import com.google.api.services.vision.v1.model.AnnotateImageRequest
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse
 import com.google.api.services.vision.v1.model.Feature
+import com.google.api.services.vision.v1.model.LatLng
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.Locale
 
 class CloudVisionManager(private val accessToken: String) {
     private val TAG = "CloudVisionManager"
+    private var landmark: String = ""
+    private var location: LatLng? = null
 
     fun detectImage(
         bitmap: Bitmap,
@@ -128,6 +131,8 @@ class CloudVisionManager(private val accessToken: String) {
                             locationInfo.latLng
                         )
                     ).append("\n")
+                    setLandmark(landmark.description)
+                    setLocation(locationInfo.latLng)
                 } else {
                     message.append(String.format(Locale.getDefault(), "%s", landmark.description))
                         .append("\n")
@@ -155,5 +160,21 @@ class CloudVisionManager(private val accessToken: String) {
             message.append("nothing\n")
         }
         return message.toString()
+    }
+
+    fun getLandmark(): String {
+        return landmark
+    }
+
+    fun setLandmark(landmark: String) {
+        this.landmark = landmark
+    }
+
+    fun getLocation(): LatLng? {
+        return this.location
+    }
+
+    fun setLocation(location: LatLng) {
+        this.location = location
     }
 }

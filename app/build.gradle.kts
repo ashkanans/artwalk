@@ -125,5 +125,7 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.glide)
     implementation(libs.roundedimageview)
-    ksp("androidx.room:room-compiler:2.6.1")
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.security.crypto)
+
 }

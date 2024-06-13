@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val REQUEST_PERMISSIONS = 13
     private var photoUri: Uri? = null
     private lateinit var currentPhotoPath: String
+    private val PERMISSION_REQUEST_CODE_ALL = 10
 
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
@@ -114,6 +116,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         sharedViewModel.navigateToFragment.observe(this) { fragmentClass ->
             fragmentClass?.let { replaceFragment(it.newInstance()) }
+        }
+        sharedViewModel.loadImageUris(this)
+        requestAllPermissions();
+    }
+
+    private fun requestAllPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.GET_ACCOUNTS,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.INTERNET,
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_MEDIA_IMAGES,
+        )
+        val permissionsToRequest: MutableList<String> = ArrayList()
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsToRequest.add(permission)
+            }
+        }
+        if (!permissionsToRequest.isEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toTypedArray<String>(),
+                PERMISSION_REQUEST_CODE_ALL
+            )
+        } else {
+            // All permissions are already granted
+            Toast.makeText(this, "All permissions are already granted", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -269,6 +306,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     ).show()
                 }
             }
+
+            PERMISSION_REQUEST_CODE_ALL -> {
+                var allPermissionsGranted = true
+                for (result in grantResults) {
+                    if (result != PackageManager.PERMISSION_GRANTED) {
+                        allPermissionsGranted = false
+                        break
+                    }
+                }
+                if (allPermissionsGranted) {
+                    Toast.makeText(this, "All permissions granted", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
+
+                }
+            }
         }
     }
 
@@ -291,7 +344,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             // Append selected images to the shared ViewModel
-            sharedViewModel.appendImages(selectedImages)
+            sharedViewModel.appendImages(this, selectedImages)
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             photoUri?.let {
                 // Notify the media scanner about the new image to make it available in the gallery
@@ -301,9 +354,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Toast.makeText(this, "Image saved to gallery", Toast.LENGTH_SHORT).show()
 
                 // Append the captured image URI to the shared ViewModel
-                sharedViewModel.appendImages(listOf(it))
+                sharedViewModel.appendImages(this, listOf(it))
             }
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        // Save the image URIs when the app stops
+        sharedViewModel.saveImageUris(this)
+    }
 }
