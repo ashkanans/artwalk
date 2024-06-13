@@ -54,7 +54,7 @@
                 android:id="@+id/row1"
                 android:layout_width="0dp"
                 android:layout_height="175dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="52dp"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -62,7 +62,7 @@
                 app:layout_constraintTop_toBottomOf="@id/landmarkImage">
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/clothingCard"
+                    android:id="@+id/googlePlacesCard"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
@@ -72,7 +72,8 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_card">
 
                         <TextView
                             android:id="@+id/googlePlacesName"
@@ -97,6 +98,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/youtubeCard"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
@@ -106,7 +108,8 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_card">
 
                         <TextView
                             android:id="@+id/youtubeName"
@@ -143,6 +146,7 @@
                 app:layout_constraintTop_toBottomOf="@id/row1">
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/spotifyCard"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
@@ -152,7 +156,8 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_card">
 
                         <TextView
                             android:id="@+id/spotifyName"
@@ -177,6 +182,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/wikiCard"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
@@ -186,7 +192,8 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_card">
 
                         <TextView
                             android:id="@+id/wikiName"
