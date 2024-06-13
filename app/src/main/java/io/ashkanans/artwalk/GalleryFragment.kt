@@ -131,9 +131,12 @@ class GalleryFragment : Fragment() {
                         },
                         { landmark ->
                             if (landmark != "nothing") {
-                                val indexOfColon = landmark.indexOf(':')
-                                val landmarkName = landmark.substring(0, indexOfColon)
-                                sharedViewModel.addBitmapToKey(landmarkName, bitmap)
+                                val landmarkNames = landmark.lines()
+                                    .map { line -> line.substringBefore(':') }
+                                    .toList()
+                                landmarkNames.filterNot { it.isEmpty() }.forEach { name ->
+                                    sharedViewModel.addBitmapToKey(name, bitmap)
+                                }
                             }
                         },
                         { error ->
