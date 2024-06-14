@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
     id("com.google.devtools.ksp") version "1.9.21-1.0.15"
+    kotlin("plugin.serialization") version "1.8.10"
 }
 
 android {
@@ -127,5 +128,9 @@ dependencies {
     implementation(libs.roundedimageview)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.security.crypto)
-
+    implementation("io.ktor:ktor-client-core:2.0.0")
+    implementation("io.ktor:ktor-client-cio:2.0.0")
+    implementation("io.ktor:ktor-client-content-negotiation:2.0.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 }

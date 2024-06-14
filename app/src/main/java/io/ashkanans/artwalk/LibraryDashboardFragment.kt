@@ -36,6 +36,23 @@ class LibraryDashboardFragment : Fragment() {
         animateCard(binding.spotifyCard, -binding.spotifyCard.width.toFloat(), 0f)
         animateCard(binding.youtubeCard, binding.youtubeCard.width.toFloat(), 0f)
         animateCard(binding.wikiCard, binding.wikiCard.width.toFloat(), 0f)
+
+        binding.googlePlacesCard.setOnClickListener {
+            navigateToPlaceDetailsFragment()
+        }
+    }
+
+    private fun navigateToPlaceDetailsFragment() {
+        val landmarkName = binding.landmarkName.text.toString()
+        val fragment = PlaceDetailsFragment().apply {
+            arguments = Bundle().apply {
+                putString("landmarkName", landmarkName)
+            }
+        }
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun animateCard(view: View, fromX: Float, toX: Float) {
