@@ -65,6 +65,32 @@ android {
             "META-INF/INDEX.LIST"
         )
     }
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("E:\\EDU\\MACC\\ArtWalk\\app\\release.keystore")
+            keyAlias = project.property("KEY_ALIAS") as String
+            keyPassword = project.property("KEY_PASSWORD") as String
+            storeFile = file(project.property("KEYSTORE_FILE") as String)
+            storePassword = project.property("KEYSTORE_PASSWORD") as String
+        }
+        create("release") {
+            storeFile = file("E:\\EDU\\MACC\\ArtWalk\\app\\release.keystore")
+            keyAlias = project.property("KEY_ALIAS") as String
+            keyPassword = project.property("KEY_PASSWORD") as String
+            storeFile = file(project.property("KEYSTORE_FILE") as String)
+            storePassword = project.property("KEYSTORE_PASSWORD") as String
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
 }
 
 dependencies {

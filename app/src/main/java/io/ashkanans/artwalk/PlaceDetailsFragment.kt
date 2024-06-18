@@ -24,8 +24,8 @@ class PlaceDetailsFragment : Fragment() {
     private var _binding: FragmentPlaceDetailsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var app: PlaceDetailsApplication // Assuming you have an application context to access services
-    private lateinit var apiKey: String // Your actual API key
+    private lateinit var app: PlaceDetailsApplication
+    private lateinit var apiKey: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,16 +38,13 @@ class PlaceDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize services
         apiKey = "AIzaSyCGygp0SRJldfPq7nWt7kPNtaJ168VZH7E" // Replace with your actual API key
         val placeSearchService = PlaceSearchServiceImpl(apiKey)
         val placeDetailsService = PlaceDetailsServiceImpl(apiKey)
         app = PlaceDetailsApplication(placeSearchService, placeDetailsService)
 
-        // Retrieve landmarkName from arguments
         val landmarkName = arguments?.getString("landmarkName")
 
-        // Start a coroutine to fetch place details
         viewLifecycleOwner.lifecycleScope.launch {
             if (!landmarkName.isNullOrEmpty()) {
                 try {
@@ -55,40 +52,29 @@ class PlaceDetailsFragment : Fragment() {
                     if (placeId != null) {
                         val placeDetails = app.getPlaceDetails(placeId)
                         if (placeDetails != null) {
-                            // Update UI with place details
                             updateUI(placeDetails)
                         } else {
-                            // Handle case where place details are not found
                             showToast("Place details not found.")
                         }
                     } else {
-                        // Handle case where place ID is not found
                         showToast("Place ID not found.")
                     }
                 } catch (e: Exception) {
-                    // Handle exceptions, e.g., network errors
                     showToast("Error fetching place details: ${e.message}")
                 }
             } else {
-                // Handle case where landmarkName is null or empty
                 showToast("Invalid landmark name.")
             }
         }
     }
-
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun updateUI(placeDetails: PlaceDetails) {
-
         binding.placeName.text = arguments?.getString("landmarkName")
-
-        // Update formatted address
         binding.placeAddress.text = placeDetails.formattedAddress
-
-        // Update rating
         binding.placeRating.text = "Rating: ${placeDetails.rating}"
 
         if (placeDetails.rating != 0.0) {
@@ -98,7 +84,6 @@ class PlaceDetailsFragment : Fragment() {
             binding.placeRatingBar.visibility = View.GONE
         }
 
-        // Update Google Maps URI and website URI
         if (placeDetails.googleMapsUri.isNotEmpty()) {
             val googleMapsUrl = placeDetails.googleMapsUri
             val googleMapsText = "Open in Google Maps"
@@ -116,7 +101,6 @@ class PlaceDetailsFragment : Fragment() {
             binding.placeGoogleMapsUrl.visibility = View.GONE
         }
 
-        // Update website URI
         if (!placeDetails.websiteUri.isNullOrEmpty()) {
             val websiteUrl = placeDetails.websiteUri
             val websiteText = "Open in Browser"
@@ -152,7 +136,7 @@ class PlaceDetailsFragment : Fragment() {
             val types = placeDetails.types.joinToString(", ") { type ->
                 type.split("_").joinToString(" ") { it.capitalize() }
             }
-            binding.placeTypes.text = "${types}"
+            binding.placeTypes.text = types
             binding.placeTypes.visibility = View.VISIBLE
         } else {
             binding.placeTypes.visibility = View.GONE

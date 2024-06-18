@@ -19,6 +19,34 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
+    <!-- Clear Cache Button -->
+    <RelativeLayout
+        android:id="@+id/layout_clear_cache"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_about"
+        android:layout_marginTop="10dp"
+        android:background="?attr/selectableItemBackground"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/text_clear_cache"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear Cache"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/icon_clear_cache"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/baseline_delete_24"
+            app:tint="@color/black" />
+    </RelativeLayout>
+
     <!-- Notifications Toggle -->
     <RelativeLayout
         android:id="@+id/layout_notifications"

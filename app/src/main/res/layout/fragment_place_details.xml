@@ -13,57 +13,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:background="?attr/selectableItemBackground"
+            android:divider="?android:attr/dividerVertical"
+            android:padding="16dp"
+            android:showDividers="middle">
 
             <!-- Place Name -->
             <TextView
                 android:id="@+id/place_name"
+                style="@style/TextAppearance.MaterialComponents.Headline5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
-                android:textSize="24sp"
-                android:textStyle="bold"
                 tools:text="Piazza del Popolo" />
 
             <!-- Place Types -->
             <TextView
                 android:id="@+id/place_types"
+                style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
-                android:textSize="14sp"
                 tools:text="Historical Landmark, Tourist Attraction" />
 
             <!-- Place Address -->
-            <TextView
-                android:id="@+id/place_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:textSize="16sp"
-                tools:text="Piazza del Popolo, 00187 Roma RM, Italy" />
-
-            <!-- Place Plus Code -->
-            <TextView
-                android:id="@+id/place_plus_code"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:textSize="14sp"
-                tools:text="8FHJWF6G+7G" />
-
-            <!-- Place Location (Latitude and Longitude) -->
-            <TextView
-                android:id="@+id/place_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:textSize="14sp"
-                tools:text="Latitude: 41.9107038, Longitude: 12.4763579" />
-
-            <!-- Place Rating -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,16 +45,84 @@
                 android:orientation="horizontal"
                 android:paddingBottom="8dp">
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="location"
+                    android:src="@drawable/baseline_location_on_24" />
+
+                <TextView
+                    android:id="@+id/place_address"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    tools:text="Piazza del Popolo, 00187 Roma RM, Italy" />
+            </LinearLayout>
+
+            <!-- Place Plus Code -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="plus_code"
+                    android:src="@drawable/ic_plus_code" />
+
+                <TextView
+                    android:id="@+id/place_plus_code"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    tools:text="8FHJWF6G+7G" />
+            </LinearLayout>
+
+            <!-- Place Location (Latitude and Longitude) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="Lat_Long"
+                    android:src="@drawable/ic_location_lat_long" />
+
+                <TextView
+                    android:id="@+id/place_location"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    tools:text="Latitude: 41.9107038, Longitude: 12.4763579" />
+            </LinearLayout>
+
+            <!-- Place Rating -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="8dp">
                 <TextView
                     android:id="@+id/place_rating"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingEnd="8dp"
-                    android:textSize="16sp"
                     tools:text="4.7" />
-
                 <RatingBar
                     android:id="@+id/place_rating_bar"
+                    style="?attr/ratingBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:isIndicator="true"
@@ -90,71 +132,127 @@
                     tools:rating="4.7" />
             </LinearLayout>
 
-            <!-- Place Google Maps URL -->
-            <TextView
-                android:id="@+id/place_google_maps_url"
+            <!-- Place User Rating Count -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:paddingBottom="8dp"
-                android:textColor="?android:textColorLink"
-                android:textSize="14sp"
-                tools:text="https://maps.google.com/?cid=4895025766821938000" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="users"
+                    android:src="@drawable/ic_users" />
+
+                <TextView
+                    android:id="@+id/place_user_rating_count"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    tools:text="106974 user ratings" />
+            </LinearLayout>
+
+            <!-- Place Google Maps URL -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="google_maps"
+                    android:src="@drawable/google_maps" />
+
+                <TextView
+                    android:id="@+id/place_google_maps_url"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:paddingStart="8dp"
+                    android:textColor="?android:textColorLink"
+                    tools:text="https://maps.google.com/?cid=4895025766821938000" />
+            </LinearLayout>
 
             <!-- Place Website URL -->
-            <TextView
-                android:id="@+id/place_website_url"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:paddingBottom="8dp"
-                android:textColor="?android:textColorLink"
-                android:textSize="14sp"
-                tools:text="https://www.turismoroma.it/it/node/1517" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="web"
+                    android:src="@drawable/ic_location_lat_long" />
+
+                <TextView
+                    android:id="@+id/place_website_url"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:paddingStart="8dp"
+                    android:textColor="?android:textColorLink"
+                    tools:text="https://www.turismoroma.it/it/node/1517" />
+            </LinearLayout>
 
             <!-- Place Business Status -->
-            <TextView
-                android:id="@+id/place_business_status"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:textSize="14sp"
-                tools:text="Operational" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp">
 
-            <!-- Place User Rating Count -->
-            <TextView
-                android:id="@+id/place_user_rating_count"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:textSize="14sp"
-                tools:text="106974 user ratings" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="business_status"
+                    android:src="@drawable/ic_business" />
+
+                <TextView
+                    android:id="@+id/place_business_status"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    tools:text="Operational" />
+            </LinearLayout>
 
             <!-- Place Display Name -->
             <TextView
                 android:id="@+id/place_display_name"
+                style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
-                android:textSize="16sp"
                 tools:text="Piazza del Popolo" />
 
             <!-- Place Short Address -->
             <TextView
                 android:id="@+id/place_short_address"
+                style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
-                android:textSize="14sp"
                 tools:text="Piazza del Popolo, Roma" />
 
             <!-- Place Editorial Summary -->
             <TextView
                 android:id="@+id/place_editorial_summary"
+                style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
-                android:textSize="14sp"
                 tools:text="Grand, landmark square centered by Rome's oldest obelisk and the site of the city's northern gate." />
 
         </LinearLayout>

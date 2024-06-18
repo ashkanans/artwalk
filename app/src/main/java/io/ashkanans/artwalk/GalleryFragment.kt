@@ -246,7 +246,13 @@ class GalleryFragment : Fragment() {
 
         private fun removeImage(position: Int) {
             val removedImage = images.removeAt(position)
-            sharedViewModel.removeImageUri(Uri.parse(removedImage))
+            val uri = Uri.parse(removedImage)
+
+            sharedViewModel.getBitmapFromUri(uri)
+                ?.let { sharedViewModel.removeBitmapFromAllValues(it) }
+            sharedViewModel.removeImageUri(uri)
+            sharedViewModel.uriToBitmapMap.remove(uri)
+
             notifyDataSetChanged()
             Toast.makeText(
                 context,

@@ -118,6 +118,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             fragmentClass?.let { replaceFragment(it.newInstance()) }
         }
         sharedViewModel.loadImageUris(this)
+        sharedViewModel.loadMapStringToImageUris(this)
+        sharedViewModel.loadUriToBitmapMap(this)
         requestAllPermissions();
     }
 
@@ -361,7 +363,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onStop() {
         super.onStop()
+        sharedViewModel.removeAll()
         // Save the image URIs when the app stops
         sharedViewModel.saveImageUris(this)
+        sharedViewModel.saveMapStringToImageUris(this)
+        sharedViewModel.saveUriToBitmapMap(this)
+        sharedViewModel.saveMapStringToImageUris(this)
     }
 }
