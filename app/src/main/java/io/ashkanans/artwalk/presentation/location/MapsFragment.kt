@@ -1,10 +1,10 @@
-package io.ashkanans.artwalk.presentation.location
-
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -14,6 +14,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.databinding.FragmentMapsBinding
+import io.ashkanans.artwalk.presentation.location.LocationHandler
+import io.ashkanans.artwalk.presentation.location.MapHandler
+import io.ashkanans.artwalk.presentation.location.SensorHandler
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
@@ -26,10 +29,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private lateinit var sensorHandler: SensorHandler
     private lateinit var mapHandler: MapHandler
 
-    companion object {
-        private const val REQUEST_IMAGE_CAPTURE = 1
-        private const val REQUEST_CAMERA_PERMISSION = 2
-    }
+    private var isCardVisible = false
 
     override fun onResume() {
         super.onResume()
@@ -50,6 +50,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             .findFragmentById(R.id.location_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        setupHandlers()
+        setupUIInteractions()
+
+        return binding.root
+    }
+
+    private fun setupHandlers() {
         locationHandler = LocationHandler(requireContext(), updateInterval) { location ->
             currentLocation = location
             mapHandler.drawCurrentLocation(location)
@@ -59,11 +66,52 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             currentLocation?.let { mapHandler.drawDirectionOnMap(it, direction) }
         }
 
+
+    }
+
+    private fun setupUIInteractions() {
         binding.relocateButton.setOnClickListener {
             currentLocation?.let { mapHandler.updateCamera(it) }
         }
 
-        return binding.root
+        binding.showLocationsButton.setOnClickListener {
+            mapHandler.toggleTouristicLocations()
+        }
+
+        binding.arrowButton.setOnClickListener {
+            toggleCardVisibility()
+        }
+    }
+
+    private fun toggleCardVisibility() {
+        isCardVisible = !isCardVisible
+        if (isCardVisible) {
+            slideUp(binding.cardView)
+        } else {
+            slideDown(binding.cardView)
+        }
+
+    }
+
+    private fun slideDown(view: View) {
+        view.visibility = View.VISIBLE
+        view.animate()
+            .translationY(view.height.toFloat())
+            .setInterpolator(AccelerateInterpolator())
+            .setDuration(350)
+            .withEndAction {
+                view.visibility = View.GONE
+            }
+    }
+
+    private fun slideUp(view: View) {
+        view.animate()
+            .translationY(0f)
+            .setInterpolator(DecelerateInterpolator())
+            .setDuration(350)
+            .withEndAction {
+                view.visibility = View.VISIBLE
+            }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -76,5 +124,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             mMap.addMarker(MarkerOptions().position(sydney).title("You are here (offline)"))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Clean up resources
+        locationHandler.stopLocationUpdates()
+        // Optionally, clear references to handlers to avoid memory leaks
     }
 }

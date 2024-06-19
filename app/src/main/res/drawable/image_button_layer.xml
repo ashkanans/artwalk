@@ -1,0 +1,8 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Layer 1: Quarter circle background -->
+    <item android:drawable="@drawable/quarter_circle" />
+    <!-- Layer 2: Arrow image positioned at top right -->
+    <item
+        android:drawable="@drawable/arrow"
+        android:gravity="top|right" />
+</layer-list>
