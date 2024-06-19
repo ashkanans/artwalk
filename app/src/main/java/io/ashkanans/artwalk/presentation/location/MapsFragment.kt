@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -31,6 +32,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private var isCardVisible = false
 
+    private lateinit var cardPagerAdapter: CardPagerAdapter
+    private lateinit var shadowTransformer: ShadowTransformer
+
     override fun onResume() {
         super.onResume()
         sensorHandler.startSensorUpdates()
@@ -46,14 +50,29 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMapsBinding.inflate(inflater, container, false)
-        val mapFragment = childFragmentManager
-            .findFragmentById(R.id.location_map) as SupportMapFragment
+        val view = binding.root
+
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.location_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         setupHandlers()
         setupUIInteractions()
 
-        return binding.root
+        // Initialize ViewPager with CardPagerAdapter
+        cardPagerAdapter = CardPagerAdapter(requireContext())
+        cardPagerAdapter.addCardItem(CardItem(R.string.title_1, R.string.text_1))
+        cardPagerAdapter.addCardItem(CardItem(R.string.title_2, R.string.text_2))
+        cardPagerAdapter.addCardItem(CardItem(R.string.title_3, R.string.text_3))
+
+        val viewPager = view.findViewById<ViewPager>(R.id.view_pager_inside_card)
+        viewPager.adapter = cardPagerAdapter
+
+        // Initialize ShadowTransformer
+        shadowTransformer = ShadowTransformer(viewPager, cardPagerAdapter)
+        viewPager.addOnPageChangeListener(shadowTransformer)
+
+        return view
     }
 
     private fun setupHandlers() {
@@ -65,8 +84,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         sensorHandler = SensorHandler(requireContext()) { direction ->
             currentLocation?.let { mapHandler.drawDirectionOnMap(it, direction) }
         }
-
-
     }
 
     private fun setupUIInteractions() {
@@ -90,7 +107,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         } else {
             slideDown(binding.cardView)
         }
-
     }
 
     private fun slideDown(view: View) {

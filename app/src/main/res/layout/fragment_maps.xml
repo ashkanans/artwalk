@@ -58,7 +58,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="200dp"
         android:layout_above="@id/show_locations_button"
         android:layout_below="@+id/arrow_button"
         android:layout_marginStart="20dp"
@@ -68,10 +68,13 @@
         android:visibility="gone"
         app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
-        app:layout_constraintBottom_toTopOf="@id/show_locations_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:cardElevation="8dp">
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager_inside_card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
