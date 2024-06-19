@@ -1,18 +1,14 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.gallery
 
-import CloudVisionManager
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -22,15 +18,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.Glide
-import com.makeramen.roundedimageview.RoundedImageView
+import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.data.network.CloudVisionManager
+import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 
 class GalleryFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var imageAdapter: ImageAdapter
     private val REQUEST_GALLERY_IMAGE = 100
     private val REQUEST_PERMISSIONS = 13
-    private val REQUEST_PERMISSIONS_DO_DETECTION = 14
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +76,6 @@ class GalleryFragment : Fragment() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-
     private fun launchImagePicker() {
         val intent = Intent().apply {
             type = "image/*"
@@ -95,6 +90,7 @@ class GalleryFragment : Fragment() {
             REQUEST_GALLERY_IMAGE
         )
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -158,7 +154,6 @@ class GalleryFragment : Fragment() {
         }
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -199,71 +194,8 @@ class GalleryFragment : Fragment() {
         }
     }
 
-
-    private class ImageAdapter(
-        private val context: Context,
-        private val sharedViewModel: SharedViewModel
-    ) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
-        private var images: MutableList<String> = mutableListOf()
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-            val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false)
-            return ImageViewHolder(view)
-        }
-
-        override fun onBindViewHolder(
-            holder: ImageViewHolder,
-            @SuppressLint("RecyclerView") position: Int
-        ) {
-            Glide.with(context)
-                .load(images[position])
-                .into(holder.imageView)
-
-            holder.imageView.setOnTouchListener(object : View.OnTouchListener {
-                private var lastTouchDownTime: Long = 0
-
-                override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                    if (event?.action == MotionEvent.ACTION_DOWN) {
-                        if (System.currentTimeMillis() - lastTouchDownTime < 300) {
-                            removeImage(position)
-                            return true
-                        }
-                        lastTouchDownTime = System.currentTimeMillis()
-                    }
-                    return false
-                }
-            })
-        }
-
-        override fun getItemCount() = images.size
-
-        fun updateImages(newImages: List<String>) {
-            images.clear()
-            images.addAll(newImages)
-            notifyDataSetChanged()
-        }
-
-        private fun removeImage(position: Int) {
-            val removedImage = images.removeAt(position)
-            val uri = Uri.parse(removedImage)
-
-            sharedViewModel.getBitmapFromUri(uri)
-                ?.let { sharedViewModel.removeBitmapFromAllValues(it) }
-            sharedViewModel.removeImageUri(uri)
-            sharedViewModel.uriToBitmapMap.remove(uri)
-
-            notifyDataSetChanged()
-            Toast.makeText(
-                context,
-                "Image removed successfully",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val imageView: RoundedImageView = itemView.findViewById(R.id.roundedImageView)
-        }
-
+    // Getter for imageAdapter
+    fun getImageAdapter(): ImageAdapter {
+        return imageAdapter
     }
 }

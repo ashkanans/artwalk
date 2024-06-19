@@ -1,5 +1,5 @@
 // SharedViewModel.kt
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.viewmodel
 
 import android.content.Context
 import android.graphics.Bitmap

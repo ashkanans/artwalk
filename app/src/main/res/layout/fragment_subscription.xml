@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="100dp"
-    tools:context=".SubscriptionFragment">
+    tools:context=".presentation.imageDetection.SubscriptionFragment">
 
     <ScrollView
         android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.library
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.presentation.library.dashboard.LibraryDashboardFragment
+import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 
 class LibraryFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel

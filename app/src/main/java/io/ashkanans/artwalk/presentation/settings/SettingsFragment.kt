@@ -1,4 +1,4 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +11,10 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.ThemeUtils
+import io.ashkanans.artwalk.presentation.about.AboutFragment
+import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 
 class SettingsFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModels()

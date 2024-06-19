@@ -1,4 +1,4 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.library.dashboard
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.fragment.app.Fragment
+import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.databinding.FragmentLibraryDashboardBinding
+import io.ashkanans.artwalk.presentation.library.dashboard.google.PlaceDetailsFragment
 
 class LibraryDashboardFragment : Fragment() {
     private var _binding: FragmentLibraryDashboardBinding? = null

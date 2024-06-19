@@ -1,4 +1,4 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.data.network
 
 import android.accounts.Account
 import android.app.Activity
@@ -6,6 +6,7 @@ import android.os.AsyncTask
 import com.google.android.gms.auth.GoogleAuthException
 import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.UserRecoverableAuthException
+import io.ashkanans.artwalk.presentation.login.LoginActivity
 import java.io.IOException
 
 class GetOAuthToken(

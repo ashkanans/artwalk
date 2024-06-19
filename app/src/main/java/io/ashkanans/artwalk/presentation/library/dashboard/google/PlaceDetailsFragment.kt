@@ -1,4 +1,4 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.library.dashboard.google
 
 import android.content.Intent
 import android.net.Uri

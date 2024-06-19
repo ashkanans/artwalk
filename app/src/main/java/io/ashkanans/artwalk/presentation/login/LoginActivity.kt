@@ -1,6 +1,5 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.login
 
-import LoginAdapter
 import android.Manifest
 import android.accounts.Account
 import android.accounts.AccountManager
@@ -21,6 +20,10 @@ import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.common.AccountPicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
+import io.ashkanans.artwalk.MainActivity
+import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.data.network.GetOAuthToken
+import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel

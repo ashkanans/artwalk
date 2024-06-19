@@ -36,6 +36,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import io.ashkanans.artwalk.presentation.about.AboutFragment
+import io.ashkanans.artwalk.presentation.gallery.GalleryFragment
+import io.ashkanans.artwalk.presentation.home.HomeFragment
+import io.ashkanans.artwalk.presentation.imageDetection.ImageDetection
+import io.ashkanans.artwalk.presentation.library.LibraryFragment
+import io.ashkanans.artwalk.presentation.location.MapsFragment
+import io.ashkanans.artwalk.presentation.login.LoginActivity
+import io.ashkanans.artwalk.presentation.settings.SettingsFragment
+import io.ashkanans.artwalk.presentation.share.ShareFragment
+import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -105,7 +115,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.map -> replaceFragment(MapsFragment())
                 R.id.library -> replaceFragment(LibraryFragment())
                 R.id.gallery -> replaceFragment(GalleryFragment())
-                R.id.image_detection -> replaceFragment(SubscriptionFragment())
+                R.id.image_detection -> replaceFragment(ImageDetection())
             }
             true
         }

@@ -1,6 +1,5 @@
-package io.ashkanans.artwalk
+package io.ashkanans.artwalk.presentation.imageDetection
 
-import CloudVisionManager
 import android.accounts.Account
 import android.app.ProgressDialog
 import android.content.Intent
@@ -18,10 +17,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import io.ashkanans.artwalk.data.network.CloudVisionManager
 import io.ashkanans.artwalk.databinding.FragmentSubscriptionBinding
+import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 import java.io.IOException
 
-class SubscriptionFragment : Fragment() {
+class ImageDetection : Fragment() {
     private lateinit var binding: FragmentSubscriptionBinding
     private val TAG = "CloudVisionExample"
     private val REQUEST_GALLERY_IMAGE = 100

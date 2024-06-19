@@ -63,7 +63,7 @@
             android:label="@string/title_activity_maps">
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".presentation.login.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_maps" />
 
