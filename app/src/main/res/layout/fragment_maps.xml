@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.home.MapsFragment">
+    tools:context="MapsFragment">
 
     <fragment
         android:id="@+id/location_map"
@@ -71,9 +71,12 @@
         app:cardElevation="8dp">
 
         <androidx.viewpager.widget.ViewPager
-            android:id="@+id/view_pager_inside_card"
+            android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:foregroundGravity="center"
+            android:overScrollMode="never" />
 
     </androidx.cardview.widget.CardView>
 

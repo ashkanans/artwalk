@@ -18,8 +18,13 @@ import io.ashkanans.artwalk.databinding.FragmentMapsBinding
 import io.ashkanans.artwalk.presentation.location.LocationHandler
 import io.ashkanans.artwalk.presentation.location.MapHandler
 import io.ashkanans.artwalk.presentation.location.SensorHandler
+import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter
+import io.ashkanans.artwalk.presentation.location.configurations.ConfigModel
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
+
+    private lateinit var configModel: ArrayList<ConfigModel>
+    private lateinit var configAdapter: ConfigAdapter
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: FragmentMapsBinding
@@ -31,9 +36,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapHandler: MapHandler
 
     private var isCardVisible = false
-
-    private lateinit var cardPagerAdapter: CardPagerAdapter
-    private lateinit var shadowTransformer: ShadowTransformer
 
     override fun onResume() {
         super.onResume()
@@ -59,20 +61,67 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         setupHandlers()
         setupUIInteractions()
 
-        // Initialize ViewPager with CardPagerAdapter
-        cardPagerAdapter = CardPagerAdapter(requireContext())
-        cardPagerAdapter.addCardItem(CardItem(R.string.title_1, R.string.text_1))
-        cardPagerAdapter.addCardItem(CardItem(R.string.title_2, R.string.text_2))
-        cardPagerAdapter.addCardItem(CardItem(R.string.title_3, R.string.text_3))
+        loadCards()
 
-        val viewPager = view.findViewById<ViewPager>(R.id.view_pager_inside_card)
-        viewPager.adapter = cardPagerAdapter
+        binding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                val title = configModel[position].title
+            }
 
-        // Initialize ShadowTransformer
-        shadowTransformer = ShadowTransformer(viewPager, cardPagerAdapter)
-        viewPager.addOnPageChangeListener(shadowTransformer)
+            override fun onPageSelected(position: Int) {}
 
+            override fun onPageScrollStateChanged(state: Int) {}
+        })
         return view
+    }
+
+    private fun loadCards() {
+        configModel = ArrayList()
+
+        configModel.add(ConfigModel("test 1", "test 1", "test 1", R.drawable.google_maps))
+        configModel.add(ConfigModel("test 2", "test 2", "test 2", R.drawable.icons8_logo_di_google))
+        configModel.add(
+            ConfigModel(
+                "test 3",
+                "test 3",
+                "test 3",
+                com.google.android.gms.base.R.drawable.googleg_disabled_color_18
+            )
+        )
+        configModel.add(
+            ConfigModel(
+                "test 4",
+                "test 4",
+                "test 4",
+                com.google.android.gms.base.R.drawable.common_google_signin_btn_icon_dark
+            )
+        )
+        configModel.add(
+            ConfigModel(
+                "test 5",
+                "test 5",
+                "test 5",
+                com.google.android.gms.auth.api.R.drawable.common_google_signin_btn_icon_light_focused
+            )
+        )
+        configModel.add(
+            ConfigModel(
+                "test 6",
+                "test 6",
+                "test 6",
+                com.google.android.gms.base.R.drawable.common_google_signin_btn_text_light_focused
+            )
+        )
+
+        configAdapter = ConfigAdapter(requireContext(), configModel)
+
+        binding.viewPager.adapter = configAdapter
+
+        binding.viewPager.setPadding(100, 0, 100, 0)
     }
 
     private fun setupHandlers() {
@@ -121,6 +170,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun slideUp(view: View) {
+        view.visibility = View.VISIBLE
         view.animate()
             .translationY(0f)
             .setInterpolator(DecelerateInterpolator())
