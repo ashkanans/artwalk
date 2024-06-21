@@ -1,9 +1,9 @@
 package io.ashkanans.artwalk.presentation.location.configurations
 
-class ConfigModel(
-    var title: String,
-    var description: String,
-    var date: String,
-    var image: Int
-) {
-}
+data class ConfigModel(
+    val title: String,
+    val description: String,
+    val date: String,
+    val image: Int,
+    val viewType: Int // Add this line
+)

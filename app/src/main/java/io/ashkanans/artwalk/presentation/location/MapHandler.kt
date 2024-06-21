@@ -15,8 +15,12 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.SphericalUtil
+import io.ashkanans.artwalk.domain.model.Place
+import io.ashkanans.artwalk.domain.model.PlaceType
 
-class MapHandler(private val map: GoogleMap) {
+class MapHandler() {
+
+    var map: GoogleMap? = null
     private var directionPolygon: Polygon? = null
     private var currentDirectionAngle: Float = 0f
     private val markers = mutableListOf<Marker>()
@@ -27,32 +31,20 @@ class MapHandler(private val map: GoogleMap) {
 
     private var currentLocationMarker: Marker? = null
 
-    val romeTouristicPlaces = listOf(
-        Location(41.8902, 12.4922, "Colosseum"),
-        Location(41.9029, 12.4534, "Vatican City"),
-        Location(41.9022, 12.4547, "St. Peter's Basilica"),
-        Location(41.8896, 12.4769, "Roman Forum"),
-        Location(41.9029, 12.4964, "Trevi Fountain"),
-        Location(41.9031, 12.4854, "Pantheon"),
-        Location(41.8903, 12.4923, "Piazza Navona"),
-        Location(41.9028, 12.4849, "Spanish Steps"),
-        Location(41.9009, 12.4833, "Campo de' Fiori"),
-        Location(41.8931, 12.4833, "Piazza Venezia"),
-        Location(41.8992, 12.4763, "Villa Borghese"),
-        Location(41.8891, 12.4817, "Capitoline Hill"),
-        Location(41.8979, 12.4717, "Castel Sant'Angelo"),
-        Location(41.8914, 12.4923, "Circus Maximus"),
-        Location(41.9023, 12.4915, "Quirinal Palace"),
-        Location(41.8964, 12.4823, "Galleria Borghese"),
-        Location(41.8897, 12.4714, "Aventine Hill"),
-        Location(41.8993, 12.4767, "Piazza del Popolo"),
-        Location(41.8923, 12.4845, "Baths of Caracalla"),
-        Location(41.9058, 12.4822, "Trastevere")
-    )
+    var placeTypes: List<PlaceType>? = null
+        get() = field
+        set(value) {
+            field = value
+        }
+    var romeTouristicPlaces: List<Place>? = null
+        get() = field
+        set(value) {
+            field = value
+        }
 
     fun updateCamera(location: Location) {
         val latLng = LatLng(location.latitude, location.longitude)
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.5f))
+        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.5f))
     }
 
     private fun createCurrentLocationBitmap(): Bitmap {
@@ -94,7 +86,7 @@ class MapHandler(private val map: GoogleMap) {
                 .position(latLng)
                 .icon(locationBitmapDescriptor)
                 .anchor(0.5f, 0.5f)
-            currentLocationMarker = map.addMarker(markerOptions)
+            currentLocationMarker = map?.addMarker(markerOptions)
         } else {
             currentLocationMarker?.setIcon(locationBitmapDescriptor)
             currentLocationMarker?.position = latLng
@@ -105,7 +97,7 @@ class MapHandler(private val map: GoogleMap) {
                 .position(latLng)
                 .icon(accuracyBitmapDescriptor)
                 .anchor(0.5f, 0.5f)
-            accuracyMarker = map.addMarker(accuracyMarkerOptions)
+            accuracyMarker = map?.addMarker(accuracyMarkerOptions)
         } else {
             accuracyMarker?.setIcon(accuracyBitmapDescriptor)
             accuracyMarker?.position = latLng
@@ -141,7 +133,7 @@ class MapHandler(private val map: GoogleMap) {
             val point = SphericalUtil.computeOffset(centerLatLng, radius.toDouble(), i.toDouble())
             sectorOptions.add(point)
         }
-        directionPolygon = map.addPolygon(sectorOptions)
+        directionPolygon = map?.addPolygon(sectorOptions)
         currentDirectionAngle = newDirection
     }
 
@@ -154,22 +146,70 @@ class MapHandler(private val map: GoogleMap) {
             markers.clear()
         } else {
             // Show markers
-            for (touristicPlace in romeTouristicPlaces) {
-                val latLng = LatLng(touristicPlace.latitude, touristicPlace.longitude)
-                val marker =
-                    map.addMarker(MarkerOptions().position(latLng).title(touristicPlace.name))
-                if (marker != null) {
-                    markers.add(marker)
+            romeTouristicPlaces?.let { places ->
+                for (touristicPlace in places) {
+                    val latLng =
+                        LatLng(touristicPlace.location.latitude, touristicPlace.location.longitude)
+
+                    // Get the primary type
+                    val type = touristicPlace.primaryType
+
+                    // Determine the color for the type and convert it to a hue value
+                    val color = typeColorMap[type] ?: typeColorMap["default"]!!
+                    val hsv = FloatArray(3)
+                    Color.colorToHSV(color, hsv)
+                    val hue = hsv[0]
+
+                    // Create a marker with the hue
+                    val marker = map?.addMarker(
+                        MarkerOptions()
+                            .position(latLng)
+                            .title(touristicPlace.displayName)
+                            .icon(BitmapDescriptorFactory.defaultMarker(hue))
+                    )
+
+                    marker?.let {
+                        markers.add(it)
+                    }
+                }
+
+                // Optionally, move the camera to the first touristic place in the list
+                if (places.isNotEmpty()) {
+                    val firstPlace = places.first()
+                    val firstLatLng =
+                        LatLng(firstPlace.location.latitude, firstPlace.location.longitude)
+                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLatLng, 12.0f))
                 }
             }
-
-            // Optionally, move the camera to the first touristic place in the list
-//            if (romeTouristicPlaces.isNotEmpty()) {
-//                val firstPlace = romeTouristicPlaces.first()
-//                val firstLatLng = LatLng(firstPlace.latitude, firstPlace.longitude)
-//                map.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLatLng, 12.0f))
-//            }
         }
         markersVisible = !markersVisible
     }
+
+
+    private val typeColorMap: Map<String, Int> = mapOf(
+        "italian_restaurant" to Color.parseColor("#FF6347"), // Tomato
+        "restaurant" to Color.parseColor("#FFD700"), // Gold
+        "mediterranean_restaurant" to Color.parseColor("#FFA500"), // Orange
+        "seafood_restaurant" to Color.parseColor("#00BFFF"), // DeepSkyBlue
+        "historical_landmark" to Color.parseColor("#8B4513"), // SaddleBrown
+        "museum" to Color.parseColor("#4682B4"), // SteelBlue
+        "park" to Color.parseColor("#32CD32"), // LimeGreen
+        "tourist_attraction" to Color.parseColor("#FF69B4"), // HotPink
+        "church" to Color.parseColor("#8A2BE2"), // BlueViolet
+        "landmark" to Color.parseColor("#7FFF00"), // Chartreuse
+        "art_gallery" to Color.parseColor("#FF4500"), // OrangeRed
+        "dog_park" to Color.parseColor("#D2691E"), // Chocolate
+        "rv_park" to Color.parseColor("#DAA520"), // GoldenRod
+        "zoo" to Color.parseColor("#CD5C5C"), // IndianRed
+        "store" to Color.parseColor("#808080"), // Gray
+        "gift_shop" to Color.parseColor("#ADFF2F"), // GreenYellow
+        "clothing_store" to Color.parseColor("#00CED1"), // DarkTurquoise
+        "ice_cream_shop" to Color.parseColor("#FFB6C1"), // LightPink
+        "event_venue" to Color.parseColor("#800080"), // Purple
+        "movie_theater" to Color.parseColor("#A52A2A"), // Brown
+        "performing_arts_theater" to Color.parseColor("#DC143C"), // Crimson
+        "market" to Color.parseColor("#7B68EE"), // MediumSlateBlue
+        "library" to Color.parseColor("#4B0082"), // Indigo
+        "default" to Color.parseColor("#FF0000") // Red for default
+    )
 }

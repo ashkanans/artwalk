@@ -1,6 +1,5 @@
 package io.ashkanans.artwalk
 
-import MapsFragment
 import android.Manifest
 import android.app.Activity
 import android.app.Dialog
@@ -42,6 +41,7 @@ import io.ashkanans.artwalk.presentation.gallery.GalleryFragment
 import io.ashkanans.artwalk.presentation.home.HomeFragment
 import io.ashkanans.artwalk.presentation.imageDetection.ImageDetection
 import io.ashkanans.artwalk.presentation.library.LibraryFragment
+import io.ashkanans.artwalk.presentation.location.MapsFragment
 import io.ashkanans.artwalk.presentation.login.LoginActivity
 import io.ashkanans.artwalk.presentation.settings.SettingsFragment
 import io.ashkanans.artwalk.presentation.share.ShareFragment

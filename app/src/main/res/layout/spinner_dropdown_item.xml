@@ -1,0 +1,36 @@
+<!-- spinner_dropdown_item.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Option for Current Location (or other options) -->
+    <TextView
+        android:id="@+id/spinnerItemText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <!-- EditText for Address -->
+    <EditText
+        android:id="@+id/addressEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Address"
+        android:inputType="text"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
+
+    <!-- EditText for Name of Place -->
+    <EditText
+        android:id="@+id/nameOfPlaceEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name of Place"
+        android:inputType="text"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
+
+</LinearLayout>

@@ -1,3 +1,5 @@
+package io.ashkanans.artwalk.presentation.location
+
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,10 +17,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.databinding.FragmentMapsBinding
-import io.ashkanans.artwalk.presentation.location.LocationHandler
-import io.ashkanans.artwalk.presentation.location.MapHandler
-import io.ashkanans.artwalk.presentation.location.SensorHandler
+import io.ashkanans.artwalk.domain.repository.places.PlacesRepositoryUsage
+import io.ashkanans.artwalk.domain.repository.placetypes.PlaceTypesRepositoryUsage
 import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter
+import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter.Companion.VIEW_TYPE_ONE
+import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter.Companion.VIEW_TYPE_TWO
 import io.ashkanans.artwalk.presentation.location.configurations.ConfigModel
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
@@ -58,6 +61,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             childFragmentManager.findFragmentById(R.id.location_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        mapHandler = MapHandler()
+
         setupHandlers()
         setupUIInteractions()
 
@@ -82,46 +87,33 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private fun loadCards() {
         configModel = ArrayList()
 
-        configModel.add(ConfigModel("test 1", "test 1", "test 1", R.drawable.google_maps))
-        configModel.add(ConfigModel("test 2", "test 2", "test 2", R.drawable.icons8_logo_di_google))
+        val placeTypes = mapHandler.placeTypes
+
+
         configModel.add(
             ConfigModel(
-                "test 3",
-                "test 3",
-                "test 3",
-                com.google.android.gms.base.R.drawable.googleg_disabled_color_18
+                "test 1",
+                "test 1",
+                "test 1",
+                R.drawable.google_maps,
+                VIEW_TYPE_ONE
             )
         )
         configModel.add(
             ConfigModel(
-                "test 4",
-                "test 4",
-                "test 4",
-                com.google.android.gms.base.R.drawable.common_google_signin_btn_icon_dark
-            )
-        )
-        configModel.add(
-            ConfigModel(
-                "test 5",
-                "test 5",
-                "test 5",
-                com.google.android.gms.auth.api.R.drawable.common_google_signin_btn_icon_light_focused
-            )
-        )
-        configModel.add(
-            ConfigModel(
-                "test 6",
-                "test 6",
-                "test 6",
-                com.google.android.gms.base.R.drawable.common_google_signin_btn_text_light_focused
+                "test 2",
+                "test 2",
+                "test 2",
+                R.drawable.icons8_logo_di_google,
+                VIEW_TYPE_TWO
             )
         )
 
-        configAdapter = ConfigAdapter(requireContext(), configModel)
+        configAdapter = ConfigAdapter(requireContext(), configModel, placeTypes)
 
         binding.viewPager.adapter = configAdapter
 
-        binding.viewPager.setPadding(100, 0, 100, 0)
+        binding.viewPager.setPadding(60, 0, 60, 0)
     }
 
     private fun setupHandlers() {
@@ -146,6 +138,26 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         binding.arrowButton.setOnClickListener {
             toggleCardVisibility()
+        }
+
+        val placeTypesRepository = PlaceTypesRepositoryUsage()
+        placeTypesRepository.fetchPlaceTypes { types ->
+            if (types != null) {
+                mapHandler.placeTypes = types
+                loadCards()
+            } else {
+                println("Failed to fetch places.")
+            }
+        }
+
+        val placesRepository = PlacesRepositoryUsage()
+        placesRepository.fetchPlaces { places ->
+            if (places != null) {
+                mapHandler.romeTouristicPlaces = places
+                loadCards()
+            } else {
+                println("Failed to fetch places.")
+            }
         }
     }
 
@@ -182,7 +194,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        mapHandler = MapHandler(mMap)
+        mapHandler.map = mMap
         if (locationHandler.checkLocationPermission()) {
             locationHandler.startLocationUpdates()
         } else {
