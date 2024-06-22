@@ -20,7 +20,7 @@
         app:endIconDrawable="@drawable/ic_clear"
         app:endIconMode="custom"
         app:endIconTint="@color/colorAccent"
-        app:startIconDrawable="@drawable/ic_users"
+        app:startIconDrawable="@drawable/ic_location"
         app:startIconTint="@color/colorAccent">
 
         <com.google.android.material.textfield.TextInputEditText

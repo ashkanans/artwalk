@@ -144,7 +144,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="users"
-                    android:src="@drawable/ic_users" />
+                    android:src="@drawable/ic_location" />
 
                 <TextView
                     android:id="@+id/place_user_rating_count"

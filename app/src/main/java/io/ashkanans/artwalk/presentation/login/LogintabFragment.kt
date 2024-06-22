@@ -9,73 +9,55 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import io.ashkanans.artwalk.MainActivity
 import io.ashkanans.artwalk.R
 import services.api.authentication.signin.SignIn
 
 class LoginTabFragment : Fragment() {
-    private lateinit var username: EditText
-    private lateinit var pass: EditText
-    private lateinit var forgetPass: View
-    private lateinit var login: View
-    private var loginClickListener: OnLoginClickListener? = null
-    private lateinit var showPasswordButton: Button
-    private var passwordVisible = false
+
+    private lateinit var usernameLayout: TextInputLayout
+    private lateinit var passwordLayout: TextInputLayout
+    private lateinit var usernameEditText: TextInputEditText
+    private lateinit var passwordEditText: TextInputEditText
+    private lateinit var forgetPassword: View
+    private lateinit var loginButton: View
+
     private lateinit var sharedPreferences: SharedPreferences
-    private val signInService = SignIn("http://46.100.50.100:63938/")
+    private val signInService =
+        SignIn("https://artwalk-1-d74f115da834.herokuapp.com/") // Replace with your service URL
+
+    private var passwordVisible = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         val root = inflater.inflate(R.layout.login_tab_fragment, container, false)
 
         sharedPreferences =
             requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
-        showPasswordButton = root.findViewById(R.id.show_password)
-        username = root.findViewById(R.id.username)
-        pass = root.findViewById(R.id.password)
-        forgetPass = root.findViewById(R.id.forget_pass)
-        login = root.findViewById(R.id.login)
+        usernameLayout = root.findViewById(R.id.username)
+        passwordLayout = root.findViewById(R.id.password)
+        usernameEditText = root.findViewById(R.id.editTextUsername)
+        passwordEditText = root.findViewById(R.id.editTextPass)
+        forgetPassword = root.findViewById(R.id.forget_pass)
+        loginButton = root.findViewById(R.id.login)
 
-        val v = 0f
+        // Animate views if needed
+        animateViews()
 
-        username.translationX = 800f
-        pass.translationX = 800f
-        forgetPass.translationX = 800f
-        login.translationX = 800f
-        showPasswordButton.translationX = 800f
-
-        username.alpha = v
-        pass.alpha = v
-        forgetPass.alpha = v
-        login.alpha = v
-        showPasswordButton.alpha = v
-
-        username.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(300).start()
-        pass.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(500).start()
-        forgetPass.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(500).start()
-        login.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(700).start()
-        showPasswordButton.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(700)
-            .start()
-
-        showPasswordButton.setOnClickListener {
-            togglePasswordVisibility()
+        // Set click listeners
+        forgetPassword.setOnClickListener {
+            // Implement forget password logic here
+            Toast.makeText(requireContext(), "Reset password clicked", Toast.LENGTH_SHORT).show()
         }
 
-        pass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        return root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        login.setOnClickListener {
+        loginButton.setOnClickListener {
             validateLogin { isValid ->
                 if (isValid) {
                     // If valid, update login state and start MainActivity
@@ -89,29 +71,64 @@ class LoginTabFragment : Fragment() {
                         requireContext(),
                         "Invalid login credentials",
                         Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    ).show()
                 }
             }
         }
+
+        // Set click listener for password visibility toggle
+        passwordLayout.setStartIconOnClickListener {
+            togglePasswordVisibility()
+        }
+
+        // Set initial state for password input type
+        passwordEditText.inputType =
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+
+        return root
+    }
+
+    private fun animateViews() {
+        val v = 0f
+        usernameLayout.translationX = 800f
+        passwordLayout.translationX = 800f
+        forgetPassword.translationX = 800f
+        loginButton.translationX = 800f
+
+        usernameLayout.alpha = v
+        passwordLayout.alpha = v
+        forgetPassword.alpha = v
+        loginButton.alpha = v
+
+        usernameLayout.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(300)
+            .start()
+        passwordLayout.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(500)
+            .start()
+        forgetPassword.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(500)
+            .start()
+        loginButton.animate().translationX(0f).alpha(1f).setDuration(800).setStartDelay(700).start()
+
     }
 
     private fun togglePasswordVisibility() {
         if (passwordVisible) {
-            pass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            showPasswordButton.text = "Show"
+            // Hide the password
+            passwordEditText.inputType =
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            passwordLayout.setStartIconDrawable(R.drawable.baseline_key_off_24)
         } else {
-            pass.inputType =
+            // Show the password
+            passwordEditText.inputType =
                 InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-            showPasswordButton.text = "Hide"
+            passwordLayout.setStartIconDrawable(R.drawable.baseline_key_24)
         }
-        pass.setSelection(pass.text.length) // Move cursor to the end
-        passwordVisible = !passwordVisible
+        passwordEditText.text?.let { passwordEditText.setSelection(it.length) } // Move cursor to the end
+        passwordVisible = !passwordVisible // Toggle flag
     }
 
     private fun validateLogin(callback: (Boolean) -> Unit) {
-        val usernameInput = username.text.toString()
-        val passwordInput = pass.text.toString()
+        val usernameInput = usernameEditText.text.toString()
+        val passwordInput = passwordEditText.text.toString()
 
         signInService.signIn(usernameInput, passwordInput) { response ->
             if (response != null) {
