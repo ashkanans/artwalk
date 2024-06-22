@@ -1,21 +1,28 @@
 package io.ashkanans.artwalk.presentation.location.configurations
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Rect
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.BaseExpandableListAdapter
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.viewpager.widget.PagerAdapter
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.domain.model.PlaceType
 
@@ -41,18 +48,15 @@ class ConfigAdapter(
         val viewType = getItemViewType(position)
         val view: View = when (viewType) {
             VIEW_TYPE_ONE -> {
-                // Inflate the first layout
                 LayoutInflater.from(context)
                     .inflate(R.layout.places_types_checkbox, container, false)
             }
 
             VIEW_TYPE_TWO -> {
-                // Inflate the second layout
                 LayoutInflater.from(context).inflate(R.layout.plan_your_time, container, false)
             }
 
             else -> {
-                // Default case (if needed)
                 LayoutInflater.from(context)
                     .inflate(R.layout.places_types_checkbox, container, false)
             }
@@ -66,8 +70,8 @@ class ConfigAdapter(
 
             VIEW_TYPE_TWO -> {
                 addPlaningData(view)
+                setupKeyboardVisibilityListener(view)
             }
-            // Handle other view types if needed
         }
 
         view.setOnClickListener {
@@ -78,35 +82,81 @@ class ConfigAdapter(
         return view
     }
 
-    private fun addPlaningData(view: View) {
-        // Find ExpandableListViews
-        val originExpandableListView =
-            view.findViewById<ExpandableListView>(R.id.originExpandableListView)
-        val destinationExpandableListView =
-            view.findViewById<ExpandableListView>(R.id.destinationExpandableListView)
+    private fun setupKeyboardVisibilityListener(view: View) {
+        val rootView = view.rootView
+        val saveAndCloseButton = view.findViewById<Button>(R.id.saveAndCloseButton)
+        val headerCardView = view.findViewById<CardView>(R.id.headerCardView)
 
-        // Set up data for Origin ExpandableListView
-        val originGroups = listOf("Origin")
-        val originChildren = listOf(
-            listOf("Enter Address or Name of Place")
-        )
-        val originAdapter = createExpandableListAdapter(originGroups[0]) // Pass single group title
-        originExpandableListView.setAdapter(originAdapter)
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            private var initialHeight = -1
+            private var wasKeyboardOpened = false
 
-        // Set up data for Destination ExpandableListView
-        val destinationGroups = listOf("Destination")
-        val destinationChildren = listOf(
-            listOf("Enter Address or Name of Place")
-        )
-        val destinationAdapter =
-            createExpandableListAdapter(destinationGroups[0]) // Pass single group title
-        destinationExpandableListView.setAdapter(destinationAdapter)
+            override fun onGlobalLayout() {
+                val rect = Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val visibleHeight = rect.bottom - rect.top
+
+                if (initialHeight == -1) {
+                    initialHeight = visibleHeight
+                }
+
+                // Check if the height difference indicates the keyboard is opened
+                val heightDifference = initialHeight - visibleHeight
+                val isKeyboardOpened = heightDifference > initialHeight * 0.15
+
+                if (isKeyboardOpened != wasKeyboardOpened) {
+                    wasKeyboardOpened = isKeyboardOpened
+
+                    if (isKeyboardOpened) {
+                        // Keyboard is opened
+                        animateViewOut(saveAndCloseButton)
+                        animateViewOut(headerCardView)
+                    } else {
+                        // Keyboard is closed
+                        animateViewIn(saveAndCloseButton)
+                        animateViewIn(headerCardView)
+                    }
+                }
+            }
+
+            private fun animateViewOut(view: View) {
+                val translationY =
+                    ObjectAnimator.ofFloat(view, "translationY", 0f, view.height.toFloat())
+                translationY.duration = 300
+                translationY.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        view.visibility = View.GONE
+                    }
+                })
+                translationY.start()
+            }
+
+            private fun animateViewIn(view: View) {
+                view.visibility = View.VISIBLE
+                val translationY =
+                    ObjectAnimator.ofFloat(view, "translationY", view.height.toFloat(), 0f)
+                translationY.duration = 300
+                translationY.start()
+            }
+        })
     }
 
-    private fun createExpandableListAdapter(groupTitle: String): BaseExpandableListAdapter {
-        val groups = listOf(groupTitle)
-        val children = listOf(listOf("Enter Address or Name of Place"))
+    private fun addPlaningData(view: View) {
+        val expandableListView = view.findViewById<ExpandableListView>(R.id.ExpandableListView)
+        val groups = listOf("Origin", "Destination")
+        val children = listOf(
+            listOf("Address or Name"),
+            listOf("Address or Name")
+        )
+        val adapter = createExpandableListAdapter(groups, children)
+        expandableListView.setAdapter(adapter)
+    }
 
+    private fun createExpandableListAdapter(
+        groups: List<String>,
+        children: List<List<String>>
+    ): BaseExpandableListAdapter {
         return object : BaseExpandableListAdapter() {
             override fun getGroupCount(): Int {
                 return groups.size
@@ -162,15 +212,18 @@ class ConfigAdapter(
             ): View {
                 val view = convertView ?: LayoutInflater.from(context)
                     .inflate(R.layout.expandable_list_item, parent, false)
-                val childEditText = view.findViewById<EditText>(R.id.childEditText)
-                val childButton = view.findViewById<Button>(R.id.childButton)
-                childEditText.hint = getChild(groupPosition, childPosition) as String
-                // Add button functionality
-                childButton.setOnClickListener {
-                    // Implement logic for setting current location
-                    Toast.makeText(context, "Set current location clicked", Toast.LENGTH_SHORT)
-                        .show()
+
+                val textInputLayout = view.findViewById<TextInputLayout>(R.id.textInputLayout)
+                val editText = view.findViewById<TextInputEditText>(R.id.editText)
+
+                if (getChild(groupPosition, childPosition) == "Set current location") {
+                    textInputLayout.visibility = View.GONE
+
+                } else {
+                    textInputLayout.visibility = View.VISIBLE
+                    editText.hint = getChild(groupPosition, childPosition) as String
                 }
+
                 return view
             }
         }
