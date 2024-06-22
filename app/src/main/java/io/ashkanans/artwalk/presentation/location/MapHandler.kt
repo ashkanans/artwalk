@@ -138,22 +138,41 @@ class MapHandler() {
     }
 
     fun toggleTouristicLocations() {
+        markersVisible = !markersVisible
         if (markersVisible) {
-            // Hide markers
+            drawPlacesMarkers()
+        } else {
             for (marker in markers) {
                 marker.remove()
             }
             markers.clear()
-        } else {
-            // Show markers
-            romeTouristicPlaces?.let { places ->
-                for (touristicPlace in places) {
-                    val latLng =
-                        LatLng(touristicPlace.location.latitude, touristicPlace.location.longitude)
+        }
+    }
 
-                    // Get the primary type
-                    val type = touristicPlace.primaryType
+    fun drawPlacesMarkers() {
+        if (!markersVisible) {
+            markersVisible = true
+        }
+        // Clear existing markers
+        for (marker in markers) {
+            marker.remove()
+        }
+        markers.clear()
 
+        // Show markers for selected place types
+        romeTouristicPlaces?.let { places ->
+            val selectedPlaceTypes =
+                placeTypes?.filter { it.isChecked }?.map { it.type } ?: emptyList()
+
+            for (touristicPlace in places) {
+                val latLng =
+                    LatLng(touristicPlace.location.latitude, touristicPlace.location.longitude)
+
+                // Get the primary type
+                val type = touristicPlace.primaryType
+
+                // Check if the type is in the selected types
+                if (type in selectedPlaceTypes) {
                     // Determine the color for the type and convert it to a hue value
                     val color = typeColorMap[type] ?: typeColorMap["default"]!!
                     val hsv = FloatArray(3)
@@ -172,17 +191,17 @@ class MapHandler() {
                         markers.add(it)
                     }
                 }
+            }
 
-                // Optionally, move the camera to the first touristic place in the list
-                if (places.isNotEmpty()) {
-                    val firstPlace = places.first()
-                    val firstLatLng =
-                        LatLng(firstPlace.location.latitude, firstPlace.location.longitude)
-                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLatLng, 12.0f))
-                }
+            // Optionally, move the camera to the first touristic place in the list
+            val filteredPlaces = places.filter { it.primaryType in selectedPlaceTypes }
+            if (filteredPlaces.isNotEmpty()) {
+                val firstPlace = filteredPlaces.first()
+                val firstLatLng =
+                    LatLng(firstPlace.location.latitude, firstPlace.location.longitude)
+                map?.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLatLng, 12.0f))
             }
         }
-        markersVisible = !markersVisible
     }
 
 

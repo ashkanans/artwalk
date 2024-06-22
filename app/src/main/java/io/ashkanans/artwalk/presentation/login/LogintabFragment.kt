@@ -15,6 +15,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.ashkanans.artwalk.MainActivity
 import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.domain.model.DataModel
+import io.ashkanans.artwalk.domain.model.User
 import services.api.authentication.signin.SignIn
 
 class LoginTabFragment : Fragment() {
@@ -134,6 +136,17 @@ class LoginTabFragment : Fragment() {
             if (response != null) {
                 Log.d("SignInResponse", "Response: $response")
                 val isValid = response.message == "Authentication successful"
+                if (isValid) {
+                    val user = User(
+                        id = response.id,
+                        username = usernameInput,
+                        token = response.token,
+                        name = "",
+                        sirname = "",
+                        phone_number = ""
+                    )
+                    DataModel.setUserModel(user)
+                }
                 callback(isValid)
             } else {
                 Log.d("SignInResponse", "Response is null")

@@ -17,8 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.databinding.FragmentMapsBinding
-import io.ashkanans.artwalk.domain.repository.places.PlacesRepositoryUsage
-import io.ashkanans.artwalk.domain.repository.placetypes.PlaceTypesRepositoryUsage
+import io.ashkanans.artwalk.domain.model.DataModel
 import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter
 import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter.Companion.VIEW_TYPE_ONE
 import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter.Companion.VIEW_TYPE_TWO
@@ -36,7 +35,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var locationHandler: LocationHandler
     private lateinit var sensorHandler: SensorHandler
-    private lateinit var mapHandler: MapHandler
+    lateinit var mapHandler: MapHandler
 
     private var isCardVisible = false
 
@@ -109,7 +108,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             )
         )
 
-        configAdapter = ConfigAdapter(requireContext(), configModel, placeTypes)
+        configAdapter = ConfigAdapter(requireContext(), configModel, placeTypes, this)
 
         binding.viewPager.adapter = configAdapter
 
@@ -140,28 +139,32 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             toggleCardVisibility()
         }
 
-        val placeTypesRepository = PlaceTypesRepositoryUsage()
-        placeTypesRepository.fetchPlaceTypes { types ->
-            if (types != null) {
-                mapHandler.placeTypes = types
-                loadCards()
-            } else {
-                println("Failed to fetch places.")
-            }
-        }
+        getPlaceTypes()
+        getPlaces()
 
-        val placesRepository = PlacesRepositoryUsage()
-        placesRepository.fetchPlaces { places ->
-            if (places != null) {
-                mapHandler.romeTouristicPlaces = places
-                loadCards()
+    }
+
+    private fun getPlaces() {
+        DataModel.getPlaceModel { placeModel ->
+            if (placeModel != null) {
+                mapHandler.romeTouristicPlaces = placeModel.dataModel
             } else {
-                println("Failed to fetch places.")
+                println("Place Types Model is null")
             }
         }
     }
 
-    private fun toggleCardVisibility() {
+    private fun getPlaceTypes() {
+        DataModel.getPlaceTypesModel { placeTypesModel ->
+            if (placeTypesModel != null) {
+                mapHandler.placeTypes = placeTypesModel.dataModel
+            } else {
+                println("Place Types Model is null")
+            }
+        }
+    }
+
+    fun toggleCardVisibility() {
         isCardVisible = !isCardVisible
         if (isCardVisible) {
             slideUp(binding.cardView)

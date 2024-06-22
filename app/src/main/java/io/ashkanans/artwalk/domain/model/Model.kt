@@ -1,8 +1,10 @@
 package io.ashkanans.artwalk.domain.model
 
+import java.util.Date
+
 data class Model<T>(
-    val id: Int,
+    val uniqueId: String,
     val name: String,
-    val dataModel: List<T>,
-    val lastUpdated: Long
+    var dataModel: List<T>,
+    val lastUpdated: Date
 )

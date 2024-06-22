@@ -18,7 +18,7 @@ class SignuptabFragment : Fragment() {
     private lateinit var confirmPass: EditText
     private lateinit var number: EditText
     private lateinit var signUp: View
-    private val baseUrl = "http://46.100.50.100:63938/"
+    private val baseUrl = "https://artwalk-1-d74f115da834.herokuapp.com/"
     private val signUpService = SignUp(baseUrl)
 
     override fun onCreateView(

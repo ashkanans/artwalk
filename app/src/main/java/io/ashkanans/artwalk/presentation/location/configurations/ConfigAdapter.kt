@@ -24,12 +24,15 @@ import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.domain.model.DataModel
 import io.ashkanans.artwalk.domain.model.PlaceType
+import io.ashkanans.artwalk.presentation.location.MapsFragment
 
 class ConfigAdapter(
     private val context: Context,
     private val modelArrayList: ArrayList<ConfigModel>,
     private val placeTypes: List<PlaceType>?,
+    private val fragment: MapsFragment // Add this line
 ) : PagerAdapter() {
 
     override fun getCount(): Int {
@@ -66,6 +69,14 @@ class ConfigAdapter(
         when (viewType) {
             VIEW_TYPE_ONE -> {
                 addPlaceTypes(view)
+                val saveAndCloseButton = view.findViewById<Button>(R.id.PTCsaveAndCloseButton)
+                saveAndCloseButton.setOnClickListener {
+                    updatePlaceTypes(view)
+                    Toast.makeText(context, "Preferences saved!", Toast.LENGTH_SHORT).show()
+                    fragment.toggleCardVisibility()
+                    fragment.mapHandler.drawPlacesMarkers()
+                }
+
             }
 
             VIEW_TYPE_TWO -> {
@@ -82,9 +93,30 @@ class ConfigAdapter(
         return view
     }
 
+    private fun updatePlaceTypes(view: View) {
+        val parentLayout = view.findViewById<LinearLayout>(R.id.parentLinearLayout)
+
+        // Iterate through each child in the parent layout
+        for (i in 0 until parentLayout.childCount) {
+            val linearLayout = parentLayout.getChildAt(i) as LinearLayout
+            val checkBox =
+                linearLayout.findViewWithTag<androidx.appcompat.widget.AppCompatCheckBox>("checkbox_$i")
+
+            // Update the isChecked value in placeTypes
+            placeTypes?.get(i)?.isChecked = checkBox.isChecked
+        }
+
+        // Optionally, update the placeTypesModel in DataModel
+        DataModel.getPlaceTypesModel { model ->
+            model?.dataModel = placeTypes ?: listOf()
+            DataModel.setPlaceTypesModel(model!!)
+        }
+
+    }
+
     private fun setupKeyboardVisibilityListener(view: View) {
         val rootView = view.rootView
-        val saveAndCloseButton = view.findViewById<Button>(R.id.saveAndCloseButton)
+        val saveAndCloseButton = view.findViewById<Button>(R.id.PYTsaveAndCloseButton)
         val headerCardView = view.findViewById<CardView>(R.id.headerCardView)
 
         rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
@@ -242,10 +274,9 @@ class ConfigAdapter(
     private fun addPlaceTypes(view: View) {
         val parentLayout = view.findViewById<LinearLayout>(R.id.parentLinearLayout)
 
-
         // Iterate over the place types and create views dynamically
         if (placeTypes != null) {
-            for (place in placeTypes) {
+            for ((index, place) in placeTypes.withIndex()) {
                 // Create the main LinearLayout
                 val linearLayout = LinearLayout(context).apply {
                     layoutParams = LinearLayout.LayoutParams(
@@ -298,13 +329,13 @@ class ConfigAdapter(
                     ).apply {
                         addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
                     }
+                    tag = "checkbox_$index" // Set a unique tag for each checkbox
                 }
 
                 // Add CheckBox to RelativeLayout
                 relativeLayout.addView(checkBox)
 
                 // Add ImageView, TextView, and RelativeLayout to main LinearLayout
-
                 linearLayout.addView(imageView)
                 linearLayout.addView(textView)
                 linearLayout.addView(relativeLayout)
