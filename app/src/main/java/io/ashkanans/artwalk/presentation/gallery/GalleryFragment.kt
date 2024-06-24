@@ -19,8 +19,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import io.ashkanans.artwalk.R
-import io.ashkanans.artwalk.data.network.CloudVisionManager
 import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
+import services.api.google.cloudvision.CloudVisionManager
 
 class GalleryFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel

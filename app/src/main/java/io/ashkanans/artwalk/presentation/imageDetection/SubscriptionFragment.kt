@@ -17,9 +17,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import io.ashkanans.artwalk.data.network.CloudVisionManager
 import io.ashkanans.artwalk.databinding.FragmentSubscriptionBinding
 import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
+import services.api.google.cloudvision.CloudVisionManager
 import java.io.IOException
 
 class ImageDetection : Fragment() {

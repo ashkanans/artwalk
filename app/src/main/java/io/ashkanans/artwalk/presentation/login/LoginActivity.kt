@@ -22,8 +22,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import io.ashkanans.artwalk.MainActivity
 import io.ashkanans.artwalk.R
-import io.ashkanans.artwalk.data.network.GetOAuthToken
 import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
+import services.api.google.cloudvision.GetOAuthToken
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel

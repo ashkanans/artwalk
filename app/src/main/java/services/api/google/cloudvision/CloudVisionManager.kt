@@ -1,4 +1,4 @@
-package io.ashkanans.artwalk.data.network
+package services.api.google.cloudvision
 
 import android.graphics.Bitmap
 import android.os.AsyncTask
@@ -20,7 +20,7 @@ import java.io.IOException
 import java.util.Locale
 
 class CloudVisionManager(private val accessToken: String) {
-    private val TAG = "io.ashkanans.artwalk.data.network.CloudVisionManager"
+    private val TAG = "services.api.google.cloudvision.CloudVisionManager"
     private var landmark: String = ""
     private var location: LatLng? = null
 

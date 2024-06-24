@@ -1,4 +1,4 @@
-package io.ashkanans.artwalk.data.network
+package services.api.google.cloudvision
 
 import android.accounts.Account
 import android.app.Activity
