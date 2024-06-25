@@ -33,6 +33,7 @@ class NavigationDrawerHandler(
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

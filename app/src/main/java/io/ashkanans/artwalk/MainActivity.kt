@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -82,6 +84,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener(
             navigationDrawerHandler
         )
+
+        sharedViewModel.navigateToFragment.observe(this, Observer { fragmentClass ->
+            fragmentClass?.let {
+                replaceFragment(it.newInstance())
+            }
+        })
     }
 
     private fun setupObservers() {
@@ -138,5 +146,12 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel.saveImageUris(this)
         sharedViewModel.saveMapStringToImageUris(this)
         sharedViewModel.saveUriToBitmapMap(this)
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null) // Optionally add to back stack
+            .commit()
     }
 }
