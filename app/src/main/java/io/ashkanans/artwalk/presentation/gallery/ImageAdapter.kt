@@ -79,4 +79,8 @@ class ImageAdapter(
     class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: RoundedImageView = itemView.findViewById(R.id.roundedImageView)
     }
+
+    fun getImages(): List<String> {
+        return images
+    }
 }

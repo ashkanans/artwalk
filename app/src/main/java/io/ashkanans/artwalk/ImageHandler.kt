@@ -1,16 +1,13 @@
 package io.ashkanans.artwalk
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import io.ashkanans.artwalk.domain.model.DataModel
 import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 import java.io.File
 import java.io.IOException
@@ -24,28 +21,8 @@ class ImageHandler(
 ) {
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_CODE_GALLERY = 123
-    private val REQUEST_PERMISSIONS = 13
     private var photoUri: Uri? = null
     private lateinit var currentPhotoPath: String
-
-    fun checkCameraPermissions(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            activity,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(
-                    activity,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    fun requestCameraPermissions() {
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
-            REQUEST_PERMISSIONS
-        )
-    }
 
     fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
@@ -100,6 +77,7 @@ class ImageHandler(
                 selectedImages.add(data.data!!)
             }
             sharedViewModel.appendImages(activity, selectedImages)
+            DataModel.appendImages(activity, selectedImages)
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             photoUri?.let {
                 val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
@@ -107,6 +85,7 @@ class ImageHandler(
                 activity.sendBroadcast(mediaScanIntent)
                 Toast.makeText(activity, "Image saved to gallery", Toast.LENGTH_SHORT).show()
                 sharedViewModel.appendImages(activity, listOf(it))
+                DataModel.appendImages(activity, listOf(it))
             }
         }
     }

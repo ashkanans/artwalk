@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.domain.model.DataModel
 import io.ashkanans.artwalk.presentation.library.dashboard.LibraryDashboardFragment
 import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 
@@ -21,7 +22,7 @@ class LibraryFragment : Fragment() {
         super.onCreate(savedInstanceState)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         sharedViewModel.removeAll()
-        sharedViewModel.saveMapStringToImageUris(requireContext())
+//        sharedViewModel.saveMapStringToImageUris(requireContext())
     }
 
     override fun onCreateView(
@@ -38,7 +39,7 @@ class LibraryFragment : Fragment() {
 
 //        sharedViewModel.loadMapStringToImageUris(requireContext())
         // Observe the imageUris LiveData and update the RecyclerView
-        sharedViewModel.mapStringToImageUris.observe(viewLifecycleOwner) { uris ->
+        DataModel.mapStringToImageUris.observe(viewLifecycleOwner) { uris ->
             adapter = ImageAdapter(uris) { caption ->
                 openLibraryDashboardFragment(caption)
             }

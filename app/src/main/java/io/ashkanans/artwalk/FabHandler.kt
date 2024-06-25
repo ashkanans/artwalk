@@ -31,11 +31,7 @@ class FabHandler(
 
         takePhotoLayout.setOnClickListener {
             dialog.dismiss()
-            if (!imageHandler.checkCameraPermissions()) {
-                imageHandler.requestCameraPermissions()
-            } else {
-                imageHandler.dispatchTakePictureIntent()
-            }
+            imageHandler.dispatchTakePictureIntent()
         }
 
         uploadGalleryLayout.setOnClickListener {

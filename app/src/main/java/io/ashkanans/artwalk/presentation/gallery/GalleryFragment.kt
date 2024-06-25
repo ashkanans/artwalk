@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.domain.model.DataModel
 import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 import services.api.google.cloudvision.CloudVisionManager
 
@@ -27,6 +28,8 @@ class GalleryFragment : Fragment() {
     private lateinit var imageAdapter: ImageAdapter
     private val REQUEST_GALLERY_IMAGE = 100
     private val REQUEST_PERMISSIONS = 13
+    private var previousImageUris: List<Uri> = emptyList()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,10 +52,10 @@ class GalleryFragment : Fragment() {
         imageAdapter = ImageAdapter(requireActivity(), sharedViewModel)
         recyclerView.adapter = imageAdapter
 
-        sharedViewModel.imageUris.observe(viewLifecycleOwner, Observer { images ->
+        DataModel.imageUris.observe(viewLifecycleOwner, Observer { images ->
             images?.let {
+                handleNewImages(it)
                 imageAdapter.updateImages(it.map { uri -> uri.toString() })
-                doDetection(it)
             }
         })
 
@@ -67,7 +70,30 @@ class GalleryFragment : Fragment() {
                 )
             }
         }
+
+        DataModel.imageUris.value?.let {
+            imageAdapter.updateImages(it.map { uri -> uri.toString() })
+        }
     }
+
+    private fun handleNewImages(currentImageUris: List<Uri>) {
+        // Retrieve the latest image URIs from ImageAdapter
+        val currentDataModelImageUris = imageAdapter.getImages().map { Uri.parse(it) }
+
+        // Find new images by comparing with currentImageUris
+        val newImages = currentImageUris.filterNot { uri ->
+            currentDataModelImageUris.any { it == uri }
+        }
+
+        // Perform detection on new images only
+        if (newImages.isNotEmpty()) {
+            doDetection(newImages)
+        }
+
+        // Update the previousImageUris to the current list
+        previousImageUris = currentImageUris
+    }
+
 
     private fun hasReadExternalStoragePermission(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -115,7 +141,7 @@ class GalleryFragment : Fragment() {
 
         uris.forEach { uri ->
             try {
-                val bitmap = sharedViewModel.getBitmapFromUri(uri)
+                val bitmap = DataModel.getBitmapFromUri(uri)
                 if (bitmap != null) {
                     cloudVisionManager.detectImage(
                         bitmap,
@@ -131,7 +157,7 @@ class GalleryFragment : Fragment() {
                                     .map { line -> line.substringBefore(':') }
                                     .toList()
                                 landmarkNames.filterNot { it.isEmpty() }.forEach { name ->
-                                    sharedViewModel.addBitmapToKey(name, bitmap)
+                                    DataModel.addBitmapToKey(name, bitmap)
                                 }
                             }
                         },

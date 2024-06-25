@@ -61,11 +61,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         mapHandler = MapHandler()
-
-        setupHandlers()
         setupUIInteractions()
-
-        loadCards()
+        setupHandlers()
 
         binding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
@@ -91,9 +88,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         configModel.add(
             ConfigModel(
-                "test 1",
-                "test 1",
-                "test 1",
+                "Maps",
+                "Google Maps",
+                "",
                 R.drawable.google_maps,
                 VIEW_TYPE_ONE
             )
@@ -141,7 +138,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         getPlaceTypes()
         getPlaces()
-
     }
 
     private fun getPlaces() {
@@ -165,6 +161,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun toggleCardVisibility() {
+        loadCards()
         isCardVisible = !isCardVisible
         if (isCardVisible) {
             slideUp(binding.cardView)

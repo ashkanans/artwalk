@@ -20,18 +20,15 @@ class SharedViewModel : ViewModel() {
     private val _navigateToFragment = MutableLiveData<Class<out Fragment>>()
     val navigateToFragment: LiveData<Class<out Fragment>> = _navigateToFragment
 
-    // Use MutableLiveData to hold the list of image URIs
-    private val _imageUris = MutableLiveData<List<Uri>>() // Change type to List<Uri>
+    private val _imageUris = MutableLiveData<List<Uri>>()
     val imageUris: LiveData<List<Uri>> = _imageUris
 
     private val _mapStringToImageUris = MutableLiveData<Map<String, List<Bitmap>>>()
     val mapStringToImageUris: LiveData<Map<String, List<Bitmap>>>
         get() = _mapStringToImageUris
 
-    // Define the map to store URI to Bitmap mapping
     val uriToBitmapMap: MutableMap<Uri, Bitmap> = mutableMapOf()
 
-    // Function to add a mapping from URI to Bitmap
     fun addUriToBitmapMapping(uri: Uri, bitmap: Bitmap) {
         uriToBitmapMap[uri] = bitmap
     }
