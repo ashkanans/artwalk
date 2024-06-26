@@ -46,6 +46,8 @@
                 android:paddingBottom="8dp">
 
                 <ImageView
+                    android:id="@+id/place_address_icon"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="location"
@@ -69,6 +71,8 @@
                 android:paddingBottom="8dp">
 
                 <ImageView
+                    android:id="@+id/place_plus_code_icon"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="plus_code"
@@ -92,6 +96,8 @@
                 android:paddingBottom="8dp">
 
                 <ImageView
+                    android:id="@+id/place_location_icon"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="Lat_Long"
@@ -141,9 +147,11 @@
                 android:paddingBottom="8dp">
 
                 <ImageView
+                    android:id="@+id/place_user_rating_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="users"
+                    android:visibility="invisible"
                     android:src="@drawable/ic_location" />
 
                 <TextView
@@ -164,9 +172,11 @@
                 android:paddingBottom="8dp">
 
                 <ImageView
+                    android:id="@+id/googlemaps_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="google_maps"
+                    android:visibility="invisible"
                     android:src="@drawable/google_maps" />
 
                 <TextView
@@ -189,6 +199,8 @@
                 android:paddingBottom="8dp">
 
                 <ImageView
+                    android:id="@+id/place_website_url_icon"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="web"
@@ -214,7 +226,9 @@
                 android:paddingBottom="8dp">
 
                 <ImageView
+                    android:id="@+id/place_business_status_icon"
                     android:layout_width="wrap_content"
+                    android:visibility="invisible"
                     android:layout_height="wrap_content"
                     android:contentDescription="business_status"
                     android:src="@drawable/ic_business" />

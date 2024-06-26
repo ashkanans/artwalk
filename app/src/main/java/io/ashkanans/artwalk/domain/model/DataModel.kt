@@ -14,6 +14,8 @@ import java.util.Date
 import java.util.UUID
 
 object DataModel {
+    private var token: String = ""
+
     private var placeModel: Model<Place>? = null
     private var placeTypesModel: Model<PlaceType>? = null
     private var userModel: Model<User>? = null
@@ -152,5 +154,13 @@ object DataModel {
             currentMap[key] = currentList
             _mapStringToImageUris.value = currentMap
         }
+    }
+
+    fun setToken(givenToken: String) {
+        token = givenToken
+    }
+
+    fun getToken(): String {
+        return token
     }
 }

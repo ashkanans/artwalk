@@ -22,7 +22,7 @@ import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 import services.api.google.cloudvision.CloudVisionManager
 import java.io.IOException
 
-class ImageDetection : Fragment() {
+class ImageDetectionFragment : Fragment() {
     private lateinit var binding: FragmentSubscriptionBinding
     private val TAG = "CloudVisionExample"
     private val REQUEST_GALLERY_IMAGE = 100

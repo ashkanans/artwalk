@@ -21,7 +21,7 @@ class LibraryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
-        sharedViewModel.removeAll(requireContext())
+//        sharedViewModel.removeAll(requireContext())
 //        sharedViewModel.saveMapStringToImageUris(requireContext())
     }
 
@@ -29,6 +29,7 @@ class LibraryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.fragment_library, container, false)
     }
 

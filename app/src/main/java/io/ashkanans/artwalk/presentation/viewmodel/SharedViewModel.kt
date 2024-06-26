@@ -13,12 +13,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import io.ashkanans.artwalk.domain.model.DataModel
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 class SharedViewModel : ViewModel() {
     private val _navigateToFragment = MutableLiveData<Class<out Fragment>>()
     val navigateToFragment: LiveData<Class<out Fragment>> = _navigateToFragment
+
+    var token: String = ""
 
     private val _imageUris = MutableLiveData<List<Uri>>()
     val imageUris: LiveData<List<Uri>> = _imageUris
@@ -116,8 +119,9 @@ class SharedViewModel : ViewModel() {
         return sharedPreferences.getString("access_token", null)
     }
 
-    fun saveToken(context: Context, token: String) {
-        saveAccessToken(context, token)
+    fun saveToken(context: Context, given_token: String) {
+        saveAccessToken(context, given_token)
+        DataModel.setToken(given_token)
     }
 
     fun getToken(context: Context): String? {
@@ -251,6 +255,7 @@ class SharedViewModel : ViewModel() {
         uriToBitmapMap.clear()
 
         // Clear SharedPreferences used in the ViewModel
+        deleteAppPref(context)
         deleteImageUris(context)
         deleteMapStringToImageUris(context)
         clearUriToBitmapMap(context)
@@ -279,6 +284,13 @@ class SharedViewModel : ViewModel() {
         editor.apply()
     }
 
+    fun deleteAppPref(context: Context) {
+        val sharedPreferences =
+            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+    }
     fun clearUriToBitmapMap(context: Context) {
         val sharedPreferences =
             context.getSharedPreferences("uri_to_bitmap_map", Context.MODE_PRIVATE)
@@ -289,5 +301,6 @@ class SharedViewModel : ViewModel() {
         // After clearing SharedPreferences, also clear the local map
         clearLocalUriToBitmapMap()
     }
+
 }
 

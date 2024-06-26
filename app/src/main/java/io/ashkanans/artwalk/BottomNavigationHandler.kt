@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.ashkanans.artwalk.presentation.gallery.GalleryFragment
-import io.ashkanans.artwalk.presentation.imageDetection.ImageDetection
+import io.ashkanans.artwalk.presentation.imageDetection.ImageDetectionFragment
 import io.ashkanans.artwalk.presentation.library.LibraryFragment
 import io.ashkanans.artwalk.presentation.location.MapsFragment
 
@@ -36,7 +36,7 @@ class BottomNavigationHandler(
 
                 R.id.image_detection -> {
                     if (checkToken()) {
-                        replaceFragment(ImageDetection())
+                        replaceFragment(ImageDetectionFragment())
                     } else {
                         showLoginToast()
                     }

@@ -29,6 +29,7 @@ class GalleryFragment : Fragment() {
     private val REQUEST_GALLERY_IMAGE = 100
     private val REQUEST_PERMISSIONS = 13
     private var previousImageUris: List<Uri> = emptyList()
+    private var cloudVisionManager: CloudVisionManager? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +41,7 @@ class GalleryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        cloudVisionManager = CloudVisionManager(DataModel.getToken())
         return inflater.inflate(R.layout.fragment_gallery, container, false)
     }
 
@@ -136,14 +138,12 @@ class GalleryFragment : Fragment() {
     }
 
     private fun doDetection(uris: List<Uri>) {
-        val cloudVisionManager =
-            CloudVisionManager(sharedViewModel.getToken(this.requireContext()) ?: "")
 
         uris.forEach { uri ->
             try {
                 val bitmap = DataModel.getBitmapFromUri(uri)
                 if (bitmap != null) {
-                    cloudVisionManager.detectImage(
+                    cloudVisionManager?.detectImage(
                         bitmap,
                         { labels ->
                             // Handle label detection if needed
@@ -152,7 +152,7 @@ class GalleryFragment : Fragment() {
                             // Handle text detection if needed
                         },
                         { landmark ->
-                            if (landmark != "nothing") {
+                            if (landmark != "nothing\n") {
                                 val landmarkNames = landmark.lines()
                                     .map { line -> line.substringBefore(':') }
                                     .toList()
@@ -162,6 +162,12 @@ class GalleryFragment : Fragment() {
                                         DataModel.appendMapStringToImageUris(map)
                                     }
                                 }
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "No landmark detected by Google Vision",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         },
                         { error ->

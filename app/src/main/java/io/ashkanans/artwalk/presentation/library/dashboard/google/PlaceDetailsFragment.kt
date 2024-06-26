@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import io.ashkanans.artwalk.databinding.FragmentPlaceDetailsBinding
@@ -75,6 +76,7 @@ class PlaceDetailsFragment : Fragment() {
     private fun updateUI(placeDetails: PlaceDetails) {
         binding.placeName.text = arguments?.getString("landmarkName")
         binding.placeAddress.text = placeDetails.formattedAddress
+        binding.placeAddressIcon.isVisible = true
         binding.placeRating.text = "Rating: ${placeDetails.rating}"
 
         if (placeDetails.rating != 0.0) {
@@ -93,8 +95,8 @@ class PlaceDetailsFragment : Fragment() {
                     openUrlInBrowser(googleMapsUrl)
                 }
             }, 0, googleMapsText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
             binding.placeGoogleMapsUrl.text = spannableGoogleMaps
+            binding.googlemapsIcon.isVisible = true
             binding.placeGoogleMapsUrl.movementMethod = LinkMovementMethod.getInstance()
             binding.placeGoogleMapsUrl.visibility = View.VISIBLE
         } else {
@@ -110,7 +112,7 @@ class PlaceDetailsFragment : Fragment() {
                     openUrlInBrowser(websiteUrl)
                 }
             }, 0, websiteText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
+            binding.placeWebsiteUrlIcon.isVisible = true
             binding.placeWebsiteUrl.text = spannableWebsite
             binding.placeWebsiteUrl.movementMethod = LinkMovementMethod.getInstance()
             binding.placeWebsiteUrl.visibility = View.VISIBLE
@@ -121,11 +123,13 @@ class PlaceDetailsFragment : Fragment() {
         val locationText =
             "Latitude: ${placeDetails.location.latitude}, Longitude: ${placeDetails.location.longitude}"
         binding.placeLocation.text = locationText
+        binding.placeLocationIcon.isVisible = true
 
         val typesText = placeDetails.types.joinToString(", ")
         binding.placeTypes.text = "Types: $typesText"
 
         if (placeDetails.userRatingCount != null) {
+            binding.placeUserRatingIcon.isVisible = true
             binding.placeUserRatingCount.text = "${placeDetails.userRatingCount} user ratings"
             binding.placeUserRatingCount.visibility = View.VISIBLE
         } else {
@@ -151,6 +155,7 @@ class PlaceDetailsFragment : Fragment() {
         }
 
         if (placeDetails.businessStatus != null) {
+            binding.placeBusinessStatusIcon.isVisible = true
             binding.placeBusinessStatus.text = "Business status: ${placeDetails.businessStatus}"
             binding.placeBusinessStatus.visibility = View.VISIBLE
         } else {
@@ -158,6 +163,7 @@ class PlaceDetailsFragment : Fragment() {
         }
 
         if (placeDetails.plusCode != null) {
+            binding.placePlusCodeIcon.isVisible = true
             binding.placePlusCode.text = "Plus Code: ${placeDetails.plusCode.globalCode}"
             binding.placePlusCode.visibility = View.VISIBLE
         } else {
