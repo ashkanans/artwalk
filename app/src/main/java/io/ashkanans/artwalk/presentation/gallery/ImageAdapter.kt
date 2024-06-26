@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.makeramen.roundedimageview.RoundedImageView
 import io.ashkanans.artwalk.R
+import io.ashkanans.artwalk.domain.model.DataModel
 import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 
 class ImageAdapter(
@@ -63,10 +64,11 @@ class ImageAdapter(
         val removedImage = images.removeAt(position)
         val uri = Uri.parse(removedImage)
 
-        sharedViewModel.getBitmapFromUri(uri)
-            ?.let { sharedViewModel.removeBitmapFromAllValues(it) }
-        sharedViewModel.removeImageUri(uri)
-        sharedViewModel.uriToBitmapMap.remove(uri)
+        DataModel.getBitmapFromUri(uri)?.let { DataModel.removeBitmapFromAllValues(it) }
+//        sharedViewModel.getBitmapFromUri(uri)
+//            ?.let { sharedViewModel.removeBitmapFromAllValues(it) }
+        DataModel.removeImageUri(uri)
+        DataModel.uriToBitmapMap.remove(uri)
 
         notifyDataSetChanged()
         Toast.makeText(

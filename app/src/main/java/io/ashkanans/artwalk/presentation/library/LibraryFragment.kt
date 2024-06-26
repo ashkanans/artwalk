@@ -21,15 +21,12 @@ class LibraryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
-//        sharedViewModel.removeAll(requireContext())
-//        sharedViewModel.saveMapStringToImageUris(requireContext())
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_library, container, false)
     }
 
@@ -39,9 +36,9 @@ class LibraryFragment : Fragment() {
         recyclerView.layoutManager = StaggeredGridLayoutManager(1, RecyclerView.VERTICAL)
 
         DataModel.mapStringToImageUris.observe(viewLifecycleOwner) { uris ->
-            adapter = ImageAdapter(uris) { caption ->
+            adapter = ImageAdapter(uris, { caption ->
                 openLibraryDashboardFragment(caption)
-            }
+            }, requireContext()) // Pass context to adapter
             recyclerView.adapter = adapter
         }
     }

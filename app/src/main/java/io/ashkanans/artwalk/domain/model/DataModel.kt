@@ -156,6 +156,32 @@ object DataModel {
         }
     }
 
+    fun removeBitmapFromAllValues(bitmap: Bitmap) {
+        val currentMap = _mapStringToImageUris.value?.toMutableMap() ?: mutableMapOf()
+        val newMap = mutableMapOf<String, List<Bitmap>>() // Use a regular mutable map
+
+        val iterator = currentMap.iterator()
+        while (iterator.hasNext()) {
+            val (key, bitmaps) = iterator.next()
+            val filteredList = bitmaps.filter { bmap -> bmap != bitmap }
+                .toList() // Convert filtered list to immutable List
+            if (filteredList.isNotEmpty()) {
+                newMap[key] = filteredList
+            }
+        }
+
+        _mapStringToImageUris.value = emptyMap()
+        _mapStringToImageUris.value =
+            newMap // Assign the updated map directly to _mapStringToImageUris.value
+    }
+
+    fun removeImageUri(uri: Uri) {
+        val currentList = _imageUris.value ?: emptyList()
+        val updatedList = currentList.toMutableList()
+        updatedList.remove(uri)
+        _imageUris.value = updatedList
+    }
+
     fun setToken(givenToken: String) {
         token = givenToken
     }

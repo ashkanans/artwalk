@@ -1,33 +1,24 @@
 package io.ashkanans.artwalk.presentation.library
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import androidx.viewpager2.widget.ViewPager2
 import io.ashkanans.artwalk.R
 
 class ImageAdapter(
     private var imageUris: Map<String, List<Bitmap>>,
-    private val onItemClicked: (String) -> Unit
+    private val onItemClicked: (String) -> Unit,
+    private val context: Context
 ) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.recyclerImage)
+        val viewPager: ViewPager2 = itemView.findViewById(R.id.imageViewPager)
         val caption: TextView = itemView.findViewById(R.id.recyclerCaption)
-    }
-
-    fun getImageUris(): Map<String, List<Bitmap>> {
-        return imageUris
-    }
-
-    // Setter for imageUris
-    fun setImageUris(uris: Map<String, List<Bitmap>>) {
-        imageUris = uris
-        notifyDataSetChanged() // Notify RecyclerView of data change
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -40,7 +31,7 @@ class ImageAdapter(
         val entry = imageUris.entries.elementAtOrNull(position)
 
         if (entry == null || entry.value.isEmpty()) {
-            Glide.with(holder.imageView.context).clear(holder.imageView)
+            // Handle empty state if needed
             holder.caption.text = ""
             return
         }
@@ -48,13 +39,10 @@ class ImageAdapter(
         val caption = entry.key
         val uriList = entry.value
 
-        Glide.with(holder.imageView.context).load(uriList[0]).into(holder.imageView)
-        holder.caption.text = caption
+        val adapter = ImageSliderAdapter(uriList, onItemClicked, caption)
+        holder.viewPager.adapter = adapter
 
-        // Set the click listener on the itemView
-        holder.itemView.setOnClickListener {
-            onItemClicked(caption)
-        }
+        holder.caption.text = caption
     }
 
     override fun getItemCount(): Int = imageUris.size
