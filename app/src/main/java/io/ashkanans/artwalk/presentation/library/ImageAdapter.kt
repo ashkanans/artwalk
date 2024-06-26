@@ -11,13 +11,23 @@ import com.bumptech.glide.Glide
 import io.ashkanans.artwalk.R
 
 class ImageAdapter(
-    private val imageUris: Map<String, List<Bitmap>>,
+    private var imageUris: Map<String, List<Bitmap>>,
     private val onItemClicked: (String) -> Unit
 ) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.recyclerImage)
         val caption: TextView = itemView.findViewById(R.id.recyclerCaption)
+    }
+
+    fun getImageUris(): Map<String, List<Bitmap>> {
+        return imageUris
+    }
+
+    // Setter for imageUris
+    fun setImageUris(uris: Map<String, List<Bitmap>>) {
+        imageUris = uris
+        notifyDataSetChanged() // Notify RecyclerView of data change
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

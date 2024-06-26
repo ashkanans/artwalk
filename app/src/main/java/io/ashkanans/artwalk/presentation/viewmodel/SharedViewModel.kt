@@ -148,14 +148,6 @@ class SharedViewModel : ViewModel() {
         }
     }
 
-    fun deleteMapStringToImageUris(context: Context) {
-        val sharedPreferences =
-            context.getSharedPreferences("map_string_to_image_uris", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.clear()
-        editor.apply()
-    }
-
     fun saveMapStringToImageUris(context: Context) {
         val sharedPreferences =
             context.getSharedPreferences("map_string_to_image_uris", Context.MODE_PRIVATE)
@@ -230,17 +222,6 @@ class SharedViewModel : ViewModel() {
         uriToBitmapMap.putAll(deserializedMap)
     }
 
-    fun clearUriToBitmapMap(context: Context) {
-        val sharedPreferences =
-            context.getSharedPreferences("uri_to_bitmap_map", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.clear() // Clear all entries
-        editor.apply()
-
-        // After clearing SharedPreferences, also clear the local map
-        clearLocalUriToBitmapMap()
-    }
-
     fun clearLocalUriToBitmapMap() {
         uriToBitmapMap.clear()
     }
@@ -264,11 +245,49 @@ class SharedViewModel : ViewModel() {
             newMap // Assign the updated map directly to _mapStringToImageUris.value
     }
 
-    fun removeAll() {
-
+    fun removeAll(context: Context) {
         _imageUris.value = emptyList()
         _mapStringToImageUris.value = emptyMap()
         uriToBitmapMap.clear()
+
+        // Clear SharedPreferences used in the ViewModel
+        deleteImageUris(context)
+        deleteMapStringToImageUris(context)
+        clearUriToBitmapMap(context)
+        clearGoogleToken(context)
+    }
+
+    private fun clearGoogleToken(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+    }
+
+    fun deleteImageUris(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("image_uris", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+    }
+
+    fun deleteMapStringToImageUris(context: Context) {
+        val sharedPreferences =
+            context.getSharedPreferences("map_string_to_image_uris", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+    }
+
+    fun clearUriToBitmapMap(context: Context) {
+        val sharedPreferences =
+            context.getSharedPreferences("uri_to_bitmap_map", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+
+        // After clearing SharedPreferences, also clear the local map
+        clearLocalUriToBitmapMap()
     }
 }
 

@@ -158,6 +158,9 @@ class GalleryFragment : Fragment() {
                                     .toList()
                                 landmarkNames.filterNot { it.isEmpty() }.forEach { name ->
                                     DataModel.addBitmapToKey(name, bitmap)
+                                    sharedViewModel.mapStringToImageUris.value?.let { map ->
+                                        DataModel.appendMapStringToImageUris(map)
+                                    }
                                 }
                             }
                         },

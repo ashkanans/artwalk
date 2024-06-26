@@ -3,6 +3,7 @@ package io.ashkanans.artwalk
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -19,6 +20,7 @@ import io.ashkanans.artwalk.presentation.viewmodel.SharedViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var bottomNavigationMenu: Menu
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var fab: FloatingActionButton
     private lateinit var sharedViewModel: SharedViewModel
@@ -77,7 +79,11 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager
         )
         bottomNavigationHandler =
-            BottomNavigationHandler(bottomNavigationView, supportFragmentManager)
+            BottomNavigationHandler(
+                bottomNavigationView,
+                supportFragmentManager,
+                sharedViewModel.getToken(this) ?: ""
+            )
         fabHandler = FabHandler(this, fab, imageHandler)
         permissionHandler = PermissionHandler(this)
 
@@ -142,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        sharedViewModel.removeAll()
+        sharedViewModel.removeAll(this)
         sharedViewModel.saveImageUris(this)
         sharedViewModel.saveMapStringToImageUris(this)
         sharedViewModel.saveUriToBitmapMap(this)

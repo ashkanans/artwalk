@@ -21,7 +21,7 @@ class LibraryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
-        sharedViewModel.removeAll()
+        sharedViewModel.removeAll(requireContext())
 //        sharedViewModel.saveMapStringToImageUris(requireContext())
     }
 
@@ -37,8 +37,6 @@ class LibraryFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = StaggeredGridLayoutManager(1, RecyclerView.VERTICAL)
 
-//        sharedViewModel.loadMapStringToImageUris(requireContext())
-        // Observe the imageUris LiveData and update the RecyclerView
         DataModel.mapStringToImageUris.observe(viewLifecycleOwner) { uris ->
             adapter = ImageAdapter(uris) { caption ->
                 openLibraryDashboardFragment(caption)

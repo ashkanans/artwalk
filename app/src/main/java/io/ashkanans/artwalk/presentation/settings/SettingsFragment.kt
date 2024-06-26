@@ -34,7 +34,7 @@ class SettingsFragment : Fragment() {
         // Clear Cache button setup
         val clearCacheButton: RelativeLayout = view.findViewById(R.id.layout_clear_cache)
         clearCacheButton.setOnClickListener {
-            sharedViewModel.removeAll()
+            sharedViewModel.removeAll(requireContext())
             sharedViewModel.clearUriToBitmapMap(requireContext())
             Toast.makeText(requireContext(), "Cache cleared!", Toast.LENGTH_SHORT).show()
         }

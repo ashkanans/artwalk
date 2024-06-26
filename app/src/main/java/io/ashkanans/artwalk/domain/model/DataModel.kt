@@ -26,6 +26,7 @@ object DataModel {
     private val _mapStringToImageUris = MutableLiveData<Map<String, List<Bitmap>>>()
     val mapStringToImageUris: LiveData<Map<String, List<Bitmap>>>
         get() = _mapStringToImageUris
+
     fun getPlaceModel(callback: (Model<Place>?) -> Unit) {
         if (placeModel == null) {
             val placesRepository = PlacesRepositoryUsage()
@@ -48,6 +49,22 @@ object DataModel {
         }
     }
 
+
+    // Method to append another map to _mapStringToImageUris
+    fun appendMapStringToImageUris(otherMap: Map<String, List<Bitmap>>) {
+        val currentMap = _mapStringToImageUris.value ?: emptyMap()
+        val combinedMap = mutableMapOf<String, List<Bitmap>>()
+
+        // Add all entries from currentMap
+        combinedMap.putAll(currentMap)
+
+        // Add or replace entries from otherMap
+        otherMap.forEach { (key, value) ->
+            combinedMap[key] = value
+        }
+
+        _mapStringToImageUris.value = combinedMap
+    }
     fun getPlaceTypesModel(callback: (Model<PlaceType>?) -> Unit) {
         if (placeTypesModel == null) {
             val placeTypesRepository = PlaceTypesRepositoryUsage()
