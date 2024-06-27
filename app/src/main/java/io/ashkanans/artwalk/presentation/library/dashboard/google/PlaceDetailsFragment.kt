@@ -44,10 +44,11 @@ class PlaceDetailsFragment : Fragment() {
         val placeDetailsService = PlaceDetailsServiceImpl(apiKey)
         app = PlaceDetailsApplication(placeSearchService, placeDetailsService)
 
-        val landmarkName = arguments?.getString("landmarkName")
+        var landmarkName = arguments?.getString("landmarkName")
 
+        landmarkName = "$landmarkName landmark"
         viewLifecycleOwner.lifecycleScope.launch {
-            if (!landmarkName.isNullOrEmpty()) {
+            if (landmarkName.isNotEmpty()) {
                 try {
                     val placeId = app.searchPlaceId(landmarkName)
                     if (placeId != null) {

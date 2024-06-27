@@ -56,7 +56,6 @@ class GalleryFragment : Fragment() {
 
         DataModel.imageUris.observe(viewLifecycleOwner, Observer { images ->
             images?.let {
-                handleNewImages(it)
                 imageAdapter.updateImages(it.map { uri -> uri.toString() })
             }
         })
@@ -76,24 +75,6 @@ class GalleryFragment : Fragment() {
         DataModel.imageUris.value?.let {
             imageAdapter.updateImages(it.map { uri -> uri.toString() })
         }
-    }
-
-    private fun handleNewImages(currentImageUris: List<Uri>) {
-        // Retrieve the latest image URIs from ImageAdapter
-        val currentDataModelImageUris = imageAdapter.getImages().map { Uri.parse(it) }
-
-        // Find new images by comparing with currentImageUris
-        val newImages = currentImageUris.filterNot { uri ->
-            currentDataModelImageUris.any { it == uri }
-        }
-
-        // Perform detection on new images only
-        if (newImages.isNotEmpty()) {
-            doDetection(newImages)
-        }
-
-        // Update the previousImageUris to the current list
-        previousImageUris = currentImageUris
     }
 
 
@@ -136,59 +117,6 @@ class GalleryFragment : Fragment() {
             Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
         }
     }
-
-    private fun doDetection(uris: List<Uri>) {
-
-        uris.forEach { uri ->
-            try {
-                val bitmap = DataModel.getBitmapFromUri(uri)
-                if (bitmap != null) {
-                    cloudVisionManager?.detectImage(
-                        bitmap,
-                        { labels ->
-                            // Handle label detection if needed
-                        },
-                        { texts ->
-                            // Handle text detection if needed
-                        },
-                        { landmark ->
-                            if (landmark != "nothing\n") {
-                                val landmarkNames = landmark.lines()
-                                    .map { line -> line.substringBefore(':') }
-                                    .toList()
-                                landmarkNames.filterNot { it.isEmpty() }.forEach { name ->
-                                    DataModel.addBitmapToKey(name, bitmap)
-                                    sharedViewModel.mapStringToImageUris.value?.let { map ->
-                                        DataModel.appendMapStringToImageUris(map)
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "No landmark detected by Google Vision",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
-                        { error ->
-                            Log.e(TAG, "Error detecting image: $error")
-                        }
-                    )
-                } else {
-                    Log.e(TAG, "Unable to open input stream for URI: $uri")
-                }
-            } catch (e: SecurityException) {
-                Log.e(
-                    TAG,
-                    "SecurityException: No persistable permission grants found for URI: $uri",
-                    e
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "Error processing image URI: $uri", e)
-            }
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {

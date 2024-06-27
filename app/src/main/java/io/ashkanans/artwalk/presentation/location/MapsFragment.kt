@@ -60,7 +60,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             childFragmentManager.findFragmentById(R.id.location_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        mapHandler = MapHandler()
+        mapHandler = MapHandler(this.requireActivity())
         setupUIInteractions()
         setupHandlers()
 
@@ -195,6 +195,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mapHandler.map = mMap
+        mapHandler.setMarkerListener()
         if (locationHandler.checkLocationPermission()) {
             locationHandler.startLocationUpdates()
         } else {

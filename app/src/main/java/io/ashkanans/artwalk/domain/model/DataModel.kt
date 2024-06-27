@@ -156,6 +156,17 @@ object DataModel {
         }
     }
 
+    fun doesBitmapExistForKey(bitmap: Bitmap): Boolean {
+        val currentMap = _mapStringToImageUris.value ?: return false
+        for (entry in currentMap) {
+            val currentList = entry.value
+            if (currentList.contains(bitmap)) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun removeBitmapFromAllValues(bitmap: Bitmap) {
         val currentMap = _mapStringToImageUris.value?.toMutableMap() ?: mutableMapOf()
         val newMap = mutableMapOf<String, List<Bitmap>>() // Use a regular mutable map

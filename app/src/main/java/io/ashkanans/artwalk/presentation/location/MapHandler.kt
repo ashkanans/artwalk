@@ -1,10 +1,13 @@
 package io.ashkanans.artwalk.presentation.location
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.location.Location
+import android.os.Bundle
+import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -15,10 +18,13 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.SphericalUtil
+import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.domain.model.Place
 import io.ashkanans.artwalk.domain.model.PlaceType
+import io.ashkanans.artwalk.presentation.library.dashboard.LibraryDashboardFragment
 
-class MapHandler() {
+@SuppressLint("PotentialBehaviorOverride")
+class MapHandler(private val parentActivity: FragmentActivity) : GoogleMap.OnMarkerClickListener {
 
     var map: GoogleMap? = null
     private var directionPolygon: Polygon? = null
@@ -41,6 +47,19 @@ class MapHandler() {
         set(value) {
             field = value
         }
+
+    fun setMarkerListener() {
+        map?.setOnMarkerClickListener { marker ->
+            marker.showInfoWindow()
+            true
+        }
+
+        map?.setOnInfoWindowClickListener { marker ->
+            marker.title?.let {
+                openLibraryDashboardFragment(it)
+            }
+        }
+    }
 
     fun updateCamera(location: Location) {
         val latLng = LatLng(location.latitude, location.longitude)
@@ -73,7 +92,6 @@ class MapHandler() {
         return bitmap
     }
 
-
     fun drawCurrentLocation(location: Location) {
         val latLng = LatLng(location.latitude, location.longitude)
         val locationBitmapDescriptor =
@@ -103,6 +121,7 @@ class MapHandler() {
             accuracyMarker?.position = latLng
         }
     }
+
     fun drawDirectionOnMap(location: Location, newDirection: Float) {
         val centerLatLng = LatLng(location.latitude, location.longitude)
         val radius = 50
@@ -204,7 +223,6 @@ class MapHandler() {
         }
     }
 
-
     private val typeColorMap: Map<String, Int> = mapOf(
         "italian_restaurant" to Color.parseColor("#FF6347"), // Tomato
         "restaurant" to Color.parseColor("#FFD700"), // Gold
@@ -231,4 +249,24 @@ class MapHandler() {
         "library" to Color.parseColor("#4B0082"), // Indigo
         "default" to Color.parseColor("#FF0000") // Red for default
     )
+
+
+    private fun openLibraryDashboardFragment(caption: String) {
+        val fragment = LibraryDashboardFragment().apply {
+            arguments = Bundle().apply {
+                putString("CAPTION", caption)
+            }
+        }
+        parentActivity.supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        marker.title?.let {
+            openLibraryDashboardFragment(it)
+        }
+        return true
+    }
 }
