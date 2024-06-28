@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.databinding.FragmentLibraryDashboardBinding
 import io.ashkanans.artwalk.presentation.library.dashboard.google.PlaceDetailsFragment
+import io.ashkanans.artwalk.presentation.library.dashboard.wikipedia.WikipediaPageFragment
 
 class LibraryDashboardFragment : Fragment() {
     private var _binding: FragmentLibraryDashboardBinding? = null
@@ -42,6 +43,23 @@ class LibraryDashboardFragment : Fragment() {
         binding.googlePlacesCard.setOnClickListener {
             navigateToPlaceDetailsFragment()
         }
+
+        binding.wikiCard.setOnClickListener {
+            navigateToWikipediaFragment()
+        }
+    }
+
+    private fun navigateToWikipediaFragment() {
+        val landmarkName = binding.landmarkName.text.toString()
+        val fragment = WikipediaPageFragment().apply {
+            arguments = Bundle().apply {
+                putString("landmarkName", landmarkName)
+            }
+        }
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun navigateToPlaceDetailsFragment() {

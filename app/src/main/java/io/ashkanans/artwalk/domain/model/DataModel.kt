@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.ashkanans.artwalk.domain.repository.places.PlacesRepositoryUsage
 import io.ashkanans.artwalk.domain.repository.placetypes.PlaceTypesRepositoryUsage
+import io.ashkanans.artwalk.domain.repository.wikipedia.WikipediaRepositoryUsage
 import java.io.IOException
 import java.util.Date
 import java.util.UUID
@@ -16,6 +17,7 @@ import java.util.UUID
 object DataModel {
     private var token: String = ""
 
+    private var WikipediaModel: Model<WikipediaPage>? = null
     private var placeModel: Model<Place>? = null
     private var placeTypesModel: Model<PlaceType>? = null
     private var userModel: Model<User>? = null
@@ -29,6 +31,27 @@ object DataModel {
     val mapStringToImageUris: LiveData<Map<String, List<Bitmap>>>
         get() = _mapStringToImageUris
 
+    fun getWikipediaModel(title: String, callback: (Model<WikipediaPage>?) -> Unit) {
+        if (WikipediaModel == null) {
+            val wikipediaRepository = WikipediaRepositoryUsage()
+            wikipediaRepository.fetchWikipediaPage(title) { wikipediaPage ->
+                if (wikipediaPage != null) {
+                    WikipediaModel = Model(
+                        dataModel = listOf(wikipediaPage),
+                        name = wikipediaPage.title,
+                        lastUpdated = Date(),
+                        uniqueId = UUID.randomUUID().toString()
+                    )
+                    callback(WikipediaModel)
+                } else {
+                    println("Failed to fetch Wikipedia page for title: $title")
+                    callback(null)
+                }
+            }
+        } else {
+            callback(WikipediaModel)
+        }
+    }
     fun getPlaceModel(callback: (Model<Place>?) -> Unit) {
         if (placeModel == null) {
             val placesRepository = PlacesRepositoryUsage()
