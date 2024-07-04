@@ -17,6 +17,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.SphericalUtil
 import io.ashkanans.artwalk.R
 import io.ashkanans.artwalk.domain.model.Place
@@ -37,12 +39,20 @@ class MapHandler(private val parentActivity: FragmentActivity) : GoogleMap.OnMar
 
     private var currentLocationMarker: Marker? = null
 
+    private val polylines = mutableListOf<Polyline>()
+
     var placeTypes: List<PlaceType>? = null
         get() = field
         set(value) {
             field = value
         }
     var romeTouristicPlaces: List<Place>? = null
+        get() = field
+        set(value) {
+            field = value
+        }
+
+    var predictedPlaces: List<Place>? = null
         get() = field
         set(value) {
             field = value
@@ -219,6 +229,85 @@ class MapHandler(private val parentActivity: FragmentActivity) : GoogleMap.OnMar
                 val firstLatLng =
                     LatLng(firstPlace.location.latitude, firstPlace.location.longitude)
                 map?.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLatLng, 12.0f))
+            }
+        }
+    }
+
+    fun drawPredictedPlacesMarkers() {
+        if (!markersVisible) {
+            markersVisible = true
+        }
+
+        // Clear existing markers and polylines
+        for (marker in markers) {
+            marker.remove()
+        }
+        markers.clear()
+
+        // Clear existing polylines
+        for (polyline in polylines) {
+            polyline.remove()
+        }
+        polylines.clear()
+
+        // Show markers for predicted places
+        predictedPlaces?.let { places ->
+            for (i in places.indices) {
+                val touristicPlace = places[i]
+                val latLng =
+                    LatLng(touristicPlace.location.latitude, touristicPlace.location.longitude)
+
+                // Get the primary type
+                val type = touristicPlace.primaryType
+
+                // Check if the type is in the selected types
+                if (true) { // Replace with your condition to filter types
+                    // Determine the color for the type and convert it to a hue value
+                    val color = typeColorMap[type] ?: typeColorMap["default"]!!
+                    val hsv = FloatArray(3)
+                    Color.colorToHSV(color, hsv)
+                    val hue = hsv[0]
+
+                    // Create a marker with the hue
+                    val marker = map?.addMarker(
+                        MarkerOptions()
+                            .position(latLng)
+                            .title(touristicPlace.displayName)
+                            .icon(BitmapDescriptorFactory.defaultMarker(hue))
+                    )
+
+                    marker?.let {
+                        markers.add(it)
+                    }
+
+                    // Draw polyline between consecutive markers
+                    if (i > 0) {
+                        val prevPlace = places[i - 1]
+                        val prevLatLng =
+                            LatLng(prevPlace.location.latitude, prevPlace.location.longitude)
+
+                        // Define polyline options
+                        val polylineOptions = PolylineOptions()
+                            .add(prevLatLng)
+                            .add(latLng)
+                            .color(Color.BLUE) // Customize the color as needed
+                            .width(5f) // Customize the width as needed
+
+                        // Add polyline to the map
+                        val polyline = map?.addPolyline(polylineOptions)
+                        polyline?.let {
+                            polylines.add(it)
+                        }
+                    }
+                }
+            }
+
+            // Move camera to the first predicted place
+            if (places.isNotEmpty()) {
+                val firstPlace = places.first()
+                val firstLatLng =
+                    LatLng(firstPlace.location.latitude, firstPlace.location.longitude)
+                map?.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLatLng, 15.0f))
             }
         }
     }

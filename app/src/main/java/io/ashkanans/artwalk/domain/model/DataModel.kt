@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.ashkanans.artwalk.domain.repository.places.PlacesRepositoryUsage
 import io.ashkanans.artwalk.domain.repository.placetypes.PlaceTypesRepositoryUsage
+import io.ashkanans.artwalk.domain.repository.predict.PredictRepositoryUsage
 import io.ashkanans.artwalk.domain.repository.wikipedia.WikipediaRepositoryUsage
 import java.io.IOException
 import java.util.Date
@@ -19,6 +20,7 @@ object DataModel {
 
     private var WikipediaModel: Model<WikipediaPage>? = null
     private var placeModel: Model<Place>? = null
+    private var predictionModel: Model<Place>? = null
     private var placeTypesModel: Model<PlaceType>? = null
     private var userModel: Model<User>? = null
 
@@ -30,6 +32,34 @@ object DataModel {
     private val _mapStringToImageUris = MutableLiveData<Map<String, List<Bitmap>>>()
     val mapStringToImageUris: LiveData<Map<String, List<Bitmap>>>
         get() = _mapStringToImageUris
+
+
+    fun getPredictionModel(
+        startId: String,
+        endId: String,
+        timeSpan: Int,
+        callback: (Model<Place>?) -> Unit
+    ) {
+        if (true) {
+            val predictRepositoryUsage = PredictRepositoryUsage()
+            predictRepositoryUsage.fetchPredictedPath(startId, endId, timeSpan) { places ->
+                if (places != null) {
+                    predictionModel = Model(
+                        dataModel = places,
+                        name = "Predicted Places",
+                        lastUpdated = Date(),
+                        uniqueId = UUID.randomUUID().toString()
+                    )
+                    callback(predictionModel)
+                } else {
+                    println("Failed to fetch predicted places.")
+                    callback(null)
+                }
+            }
+        } else {
+            callback(placeModel)
+        }
+    }
 
     fun getWikipediaModel(title: String, callback: (Model<WikipediaPage>?) -> Unit) {
         if (WikipediaModel == null) {

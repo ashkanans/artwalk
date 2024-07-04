@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.BaseExpandableListAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -82,6 +83,48 @@ class ConfigAdapter(
             VIEW_TYPE_TWO -> {
                 addPlaningData(view)
                 setupKeyboardVisibilityListener(view)
+                val saveButton = view.findViewById<Button>(R.id.PYTsaveAndCloseButton)
+                saveButton.setOnClickListener {
+                    val origin = view.findViewById<EditText>(R.id.editTextPlan).text.toString()
+                    val minutesText =
+                        view.findViewById<EditText>(R.id.editTextMinutes).text.toString()
+
+                    if (origin.isNotEmpty() && minutesText.isNotEmpty()) {
+                        try {
+                            val minutes = minutesText.toInt()
+                            DataModel.getPredictionModel(origin, "", minutes) { predictions ->
+                                if (predictions != null) {
+                                    fragment.mapHandler.predictedPlaces = predictions.dataModel
+                                    Toast.makeText(
+                                        context,
+                                        "Preferences saved!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    fragment.toggleCardVisibility()
+                                    fragment.mapHandler.drawPredictedPlacesMarkers()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Failed to get predictions!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        } catch (e: NumberFormatException) {
+                            Toast.makeText(
+                                context,
+                                "Invalid input for minutes!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Please enter origin and minutes!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
         }
 
@@ -246,7 +289,7 @@ class ConfigAdapter(
                     .inflate(R.layout.expandable_list_item, parent, false)
 
                 val textInputLayout = view.findViewById<TextInputLayout>(R.id.textInputLayout)
-                val editText = view.findViewById<TextInputEditText>(R.id.editText)
+                val editText = view.findViewById<TextInputEditText>(R.id.editTextPlan)
 
                 if (getChild(groupPosition, childPosition) == "Set current location") {
                     textInputLayout.visibility = View.GONE
