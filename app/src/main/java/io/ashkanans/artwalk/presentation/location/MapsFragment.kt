@@ -1,5 +1,6 @@
 package io.ashkanans.artwalk.presentation.location
 
+import android.app.AlertDialog
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -24,6 +28,8 @@ import io.ashkanans.artwalk.presentation.location.configurations.ConfigAdapter.C
 import io.ashkanans.artwalk.presentation.location.configurations.ConfigModel
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
+    private lateinit var viewModel: MapsViewModel
+    private var progressDialog: AlertDialog? = null
 
     private lateinit var configModel: ArrayList<ConfigModel>
     private lateinit var configAdapter: ConfigAdapter
@@ -47,6 +53,59 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onPause() {
         super.onPause()
         sensorHandler.stopSensorUpdates()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
+        setupObservers()
+    }
+
+    private fun setupObservers() {
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                showProgressDialog()
+            } else {
+                hideProgressDialog()
+            }
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            message?.let {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.predictions.observe(viewLifecycleOwner) { predictions ->
+            predictions?.let {
+                // Handle displaying predictions on the map
+                mapHandler.predictedPlaces = it
+                mapHandler.drawPredictedPlacesMarkers()
+            }
+        }
+    }
+
+    private fun showProgressDialog() {
+        if (progressDialog == null) {
+            val builder = AlertDialog.Builder(requireContext())
+            val inflater = layoutInflater
+            val dialogView = inflater.inflate(R.layout.dialog_progress, null)
+            builder.setView(dialogView)
+            builder.setCancelable(false)
+
+            val cancelButton = dialogView.findViewById<Button>(R.id.cancel_button)
+            cancelButton.setOnClickListener {
+                viewModel.cancelPrediction()
+                hideProgressDialog()
+            }
+
+            progressDialog = builder.create()
+        }
+        progressDialog?.show()
+    }
+
+    private fun hideProgressDialog() {
+        progressDialog?.dismiss()
     }
 
     override fun onCreateView(

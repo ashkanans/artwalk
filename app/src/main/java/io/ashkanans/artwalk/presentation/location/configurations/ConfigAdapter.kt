@@ -3,6 +3,7 @@ package io.ashkanans.artwalk.presentation.location.configurations
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
@@ -91,8 +92,10 @@ class ConfigAdapter(
 
                     if (origin.isNotEmpty() && minutesText.isNotEmpty()) {
                         try {
-                            val minutes = minutesText.toInt()
+                            val minutes = minutesText.toInt() * 60
+                            showProgressDialog()
                             DataModel.getPredictionModel(origin, "", minutes) { predictions ->
+                                hideProgressDialog()
                                 if (predictions != null) {
                                     fragment.mapHandler.predictedPlaces = predictions.dataModel
                                     Toast.makeText(
@@ -111,6 +114,7 @@ class ConfigAdapter(
                                 }
                             }
                         } catch (e: NumberFormatException) {
+                            hideProgressDialog()
                             Toast.makeText(
                                 context,
                                 "Invalid input for minutes!",
@@ -134,6 +138,31 @@ class ConfigAdapter(
 
         container.addView(view, position)
         return view
+    }
+
+    private var progressDialog: AlertDialog? = null
+
+    private fun showProgressDialog() {
+        if (progressDialog == null) {
+            val builder = AlertDialog.Builder(context)
+            val inflater = LayoutInflater.from(context)
+            val dialogView = inflater.inflate(R.layout.dialog_progress, null)
+            builder.setView(dialogView)
+            builder.setCancelable(false)
+
+            val cancelButton = dialogView.findViewById<Button>(R.id.cancel_button)
+            cancelButton.setOnClickListener {
+                // Implement cancel functionality
+                hideProgressDialog()
+            }
+
+            progressDialog = builder.create()
+        }
+        progressDialog?.show()
+    }
+
+    private fun hideProgressDialog() {
+        progressDialog?.dismiss()
     }
 
     private fun updatePlaceTypes(view: View) {

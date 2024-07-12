@@ -1,6 +1,8 @@
 package services.api.places
 
+import io.ashkanans.artwalk.domain.model.DataModel
 import io.ashkanans.artwalk.domain.model.Place
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -15,8 +17,17 @@ class Places(private val baseUrl: String) {
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
     }
 
+    // Interceptor to add the Authorization header with the bearer token
+    private val authInterceptor = Interceptor { chain ->
+        val original = chain.request()
+        val requestBuilder = original.newBuilder()
+            .header("Authorization", "Bearer ${DataModel.getUserToken()}")
+        val request = requestBuilder.build()
+        chain.proceed(request)
+    }
     private val client = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
+        .addInterceptor(authInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)

@@ -33,7 +33,12 @@ object DataModel {
     val mapStringToImageUris: LiveData<Map<String, List<Bitmap>>>
         get() = _mapStringToImageUris
 
+    private val _pingSuccessful = MutableLiveData<Boolean>()
+    val pingSuccessful: LiveData<Boolean> = _pingSuccessful
 
+    fun setPingSuccessful(success: Boolean) {
+        _pingSuccessful.postValue(success)
+    }
     fun getPredictionModel(
         startId: String,
         endId: String,
@@ -162,6 +167,9 @@ object DataModel {
         userModel = model
     }
 
+    fun getUserToken(): String {
+        return userModel?.dataModel?.get(0)?.token ?: ""
+    }
     fun appendImages(context: Activity, newImages: List<Uri>) {
         val currentList = _imageUris.value ?: emptyList()
         val updatedList = currentList.toMutableList()
